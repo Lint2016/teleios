@@ -1,4 +1,38 @@
+//================================
+//===========Carousel=============
+//================================
+const carouselImages = [
+    'images/t2.jpg',
+    'images/t3.jpg',
+    'images/t4.jpg',
+    'images/t5.jpg',
+    'images/t6.jpg',
+    'images/t7.jpg',
+    'images/t8.jpg',
+    'images/t9.jpg',
+    'images/t10.jpg',
+    'images/t11.jpg',
+    'images/t12.jpg',
+    'images/t13.jpg',
+    'images/t14.jpg',
+    'images/t15.jpg',
+    'images/t16.jpg',
+    'images/t17.jpg',
+    'images/t18.jpg',
+    'images/t19.jpg',
+    'images/t20.jpg',
+    'images/t21.jpg',
+    'images/t22.jpg'
+]
+let index= 0;
 
+function displayPictures(){
+const imagePath =document.getElementById('carousel-img');
+imagePath.src= carouselImages[index]
+index= (index+1)%carouselImages.length
+}
+displayPictures();
+setInterval(displayPictures, 2000)
 // Global variables
 const navbar = document.getElementById('navbar');
 const mobileMenu = document.getElementById('mobile-menu');

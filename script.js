@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     initializeNavigation();
     initializeVideoModal();
-    initializeContactForm();
+   // initializeContactForm();
     initializeFormAnimations();
     //loadUpcomingEvents();
    // initializeLoadingAnimations();
@@ -369,56 +369,60 @@ function initializeNavigation() {
 }
 
 // ============================================
-// Contact Form Handling
+// Contact Form Submission Handling  with formspree
 // ============================================
-function initializeContactForm() {
-    const contactForm = document.getElementById('contact-form');
-    
-if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Get form data
-        const formData = new FormData(this);
-        const name = formData.get('name');
-        const email = formData.get('email');
-        const subject = formData.get('subject');
-        const message = formData.get('message');
-        
-        // Basic validation
-        if (!name || !email || !subject || !message) {
-            showNotification('Please fill in all fields.', 'error');
-            return;
-        }
-        
-        if (!isValidEmail(email)) {
-            showNotification('Please enter a valid email address.', 'error');
-            return;
-        }
-        
-        // Simulate form submission
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Sending...';
-        submitBtn.disabled = true;
-        
-        setTimeout(() => {
-            showNotification('Thank you! Your message has been sent successfully.', 'success');
-            this.reset();
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-            
-            // Reset form labels
-            const labels = this.querySelectorAll('label');
-            labels.forEach(label => {
-                label.style.top = '15px';
-                label.style.fontSize = '1rem';
-                label.style.color = 'var(--medium-text)';
-            });
-        }, 2000);
+const form = document.getElementById('contact-form');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(form);
+  
+// Show loading SweetAlert
+  Swal.fire({
+    title: 'Sending...',
+    text: 'Please wait while we submit your message.',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  try {
+    const response = await fetch(form.action, {
+      method: form.method,
+      body: formData,
+      headers: { 'Accept': 'application/json' }
     });
-}
-}
+
+    Swal.close();
+    if (response.ok) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Message Sent!',
+        text: 'Thanks for reaching out, we will get back to you soon!',
+        confirmButtonColor: '#3085d6'
+      });
+      form.reset();
+    } else {
+        const data = await response.json();
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops!',
+        text: 'Message not sent, please try again!',
+        confirmButtonColor: '#d33'
+      });
+    }
+  } catch (err) {
+    Swal.close();
+    Swal.fire({
+      icon: 'warning',
+      title: 'Network Error',
+      text: 'Check your connection and try again.',
+      confirmButtonColor: '#f39c12'
+    });
+  }
+});
     
 // ============================================
 // Form Input Animations

@@ -38,9 +38,8 @@ const navbar = document.getElementById('navbar');
 const mobileMenu = document.getElementById('mobile-menu');
 const navMenu = document.getElementById('nav-menu');
 const navLinks = document.querySelectorAll('.nav-link');
-let videoModal, sermonVideo, iframe, closeBtn; // Will be initialized in DOMContentLoaded
+let videoModal, iframe, closeBtn; // Will be initialized in DOMContentLoaded
 
-// Move this to the top of your script.js, after variable declarations
 function updateActiveNavLink() {
     const sections = document.querySelectorAll('section[id]');
     const scrollPos = window.scrollY + 100;
@@ -61,98 +60,84 @@ function updateActiveNavLink() {
     });
 }
 // ============================================
-    // Video Modal Functionality
-    // ============================================
-    function initializeVideoModal() {
-        const videoModal = document.getElementById('videoModal');
-        const closeBtn = document.getElementById('closeModal');
-        
-        if (!videoModal || !closeBtn) return;
-        
-        // Initialize close button
-        closeBtn.addEventListener('click', function() {
-            videoModal.classList.remove('show');
-            const iframe = videoModal.querySelector('iframe');
-            if (iframe) iframe.src = '';
-            document.body.style.overflow = 'auto';
-        });
-        
-        // Close when clicking outside the modal
-        videoModal.addEventListener('click', function(e) {
-            if (e.target === videoModal) {
-                videoModal.classList.remove('show');
-                const iframe = videoModal.querySelector('iframe');
-                if (iframe) iframe.src = '';
-                document.body.style.overflow = 'auto';
-            }
-        });
-        
-        // Initialize video buttons
-        const videoButtons = document.querySelectorAll('.btn-video');
-        if (videoButtons.length > 0) {
-            videoButtons.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    console.log('Video button clicked');
-                    
-                    const card = this.closest('.sermon-card');
-                    if (!card) {
-                        console.error('Could not find parent sermon card');
-                        showNotification('Error: Could not find sermon information', 'error');
-                        return;
-                    }
-                    
-                    const videoId = card.getAttribute('data-video-id');
-                    if (!videoId) {
-                        console.error('No video ID found on sermon card');
-                        showNotification('Error: No video available', 'error');
-                        return;
-                    }
-                    
-                    console.log('Loading YouTube video:', videoId);
-                    
-                    const videoIframe = document.getElementById('videoIframe');
-                    if (videoIframe) {
-                        videoIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0`;
-                        const modal = document.getElementById('videoModal');
-                        if (modal) {
-                            modal.classList.add('show');
-                            document.body.style.overflow = 'hidden';
-                        }
-                    }
-                });
-            });
-        }
-    }
+// Video Modal Functionality
+// ============================================
+function initializeVideoModal() {
+    const modalElement = document.getElementById('videoModal');
+    const closeButton = document.getElementById('closeModal');
     
+    if (!modalElement || !closeButton) return;
 
+    videoModal = modalElement;
+    closeBtn = closeButton;
+    iframe = document.getElementById('videoIframe');
+    
+    const closeModal = () => {
+        videoModal.classList.remove('show');
+        const frame = videoModal.querySelector('iframe');
+        if (frame) frame.src = '';
+        document.body.style.overflow = 'auto';
+    };
 
-// Then in your DOMContentLoaded:
-document.addEventListener('DOMContentLoaded', function() {
-    // Other initializations...
-    updateActiveNavLink(); // This will now work
-    // Rest of your code...
-});
+    // Initialize close button (click + keyboard)
+    closeBtn.addEventListener('click', closeModal);
+    closeBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            closeModal();
+        }
+    });
+    
+    // Close when clicking outside the modal content
+    videoModal.addEventListener('click', function(e) {
+        if (e.target === videoModal) {
+            closeModal();
+        }
+    });
+    
+    // Initialize video buttons
+    const videoButtons = document.querySelectorAll('.btn-video');
+    if (videoButtons.length > 0) {
+        videoButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const card = this.closest('.sermon-card');
+                if (!card) {
+                    showNotification('Error: Could not find sermon information', 'error');
+                    return;
+                }
+                
+                const videoId = card.getAttribute('data-video-id');
+                if (!videoId) {
+                    showNotification('Error: No video available', 'error');
+                    return;
+                }
+                
+                const frame = document.getElementById('videoIframe');
+                if (frame) {
+                    frame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0`;
+                    videoModal.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                    closeBtn.focus();
+                }
+            });
+        });
+    }
+}
 
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize global variables
+    // Initialize global references
     videoModal = document.getElementById('videoModal');
-    sermonVideo = document.getElementById('sermonVideo');
     iframe = document.getElementById('videoIframe');
     closeBtn = document.getElementById('closeModal');
     
     initializeNavigation();
     initializeVideoModal();
-   // initializeContactForm();
     initializeFormAnimations();
-    //loadUpcomingEvents();
-   // initializeLoadingAnimations();
-   // setThemeColor();
     updateActiveNavLink();
-   // initializeLazyLoading();
     initializeScrollHandlers();
     initializeKeyboardNavigation();
     
@@ -167,11 +152,24 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================================
 function initializeNavigation() {
     
-    // Mobile menu toggle
-    mobileMenu.addEventListener('click', function() {
+    // Mobile menu toggle (click + keyboard)
+    const toggleMenu = () => {
         mobileMenu.classList.toggle('active');
         navMenu.classList.toggle('active');
         document.body.classList.toggle('menu-open');
+        const expanded = mobileMenu.classList.contains('active');
+        mobileMenu.setAttribute('aria-expanded', expanded.toString());
+        if (expanded && navLinks.length > 0) {
+            navLinks[0].focus();
+        }
+    };
+
+    mobileMenu.addEventListener('click', toggleMenu);
+    mobileMenu.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleMenu();
+        }
     });
     
     // Close mobile menu when clicking on a link
@@ -196,30 +194,6 @@ function initializeNavigation() {
         
         lastScrollTop = scrollTop;
     });
-    
-    // ============================================
-    // Active Navigation Link
-    // ============================================
-    
-    function updateActiveNavLink() {
-        const sections = document.querySelectorAll('section[id]');
-        const scrollPos = window.scrollY + 100;
-        
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-            const sectionId = section.getAttribute('id');
-            
-            if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${sectionId}`) {
-                        link.classList.add('active');
-                    }
-                });
-            }
-        });
-    }
     
     // Call it once to set initial active state
     updateActiveNavLink();
@@ -335,8 +309,7 @@ function initializeNavigation() {
         
         updateCounter();
     }
-    
-    
+
     // ============================================
     // Sermon Media Players
     // ============================================
@@ -362,66 +335,63 @@ function initializeNavigation() {
         });
     });
     
-    // Initialize the video modal functionality
-    initializeVideoModal();
-
-    // Video button initialization is now handled in initializeVideoModal()
+    // Video button initialization is handled in initializeVideoModal()
 }
 
 // ============================================
-// Contact Form Submission Handling  with formspree
+// Contact & Prayer Form Submission Handling with Formspree
 // ============================================
-const form = document.getElementById('contact-form');
+const forms = document.querySelectorAll('.contact-form');
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+forms.forEach(form => {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  const formData = new FormData(form);
-  
-// Show loading SweetAlert
-  Swal.fire({
-    title: 'Sending...',
-    text: 'Please wait while we submit your message.',
-    allowOutsideClick: false,
-    didOpen: () => {
-      Swal.showLoading();
+    const formData = new FormData(form);
+
+    Swal.fire({
+      title: 'Sending...',
+      text: 'Please wait while we submit your message.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    try {
+      const response = await fetch(form.action, {
+        method: form.method,
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      Swal.close();
+      if (response.ok) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Message Sent!',
+          text: 'Thank you, your submission has been received.',
+          confirmButtonColor: '#3085d6'
+        });
+        form.reset();
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops!',
+          text: 'Message not sent, please try again!',
+          confirmButtonColor: '#d33'
+        });
+      }
+    } catch (err) {
+      Swal.close();
+      Swal.fire({
+        icon: 'warning',
+        title: 'Network Error',
+        text: 'Check your connection and try again.',
+        confirmButtonColor: '#f39c12'
+      });
     }
   });
-
-  try {
-    const response = await fetch(form.action, {
-      method: form.method,
-      body: formData,
-      headers: { 'Accept': 'application/json' }
-    });
-
-    Swal.close();
-    if (response.ok) {
-      Swal.fire({
-        icon: 'success',
-        title: 'Message Sent!',
-        text: 'Thanks for reaching out, we will get back to you soon!',
-        confirmButtonColor: '#3085d6'
-      });
-      form.reset();
-    } else {
-        const data = await response.json();
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops!',
-        text: 'Message not sent, please try again!',
-        confirmButtonColor: '#d33'
-      });
-    }
-  } catch (err) {
-    Swal.close();
-    Swal.fire({
-      icon: 'warning',
-      title: 'Network Error',
-      text: 'Check your connection and try again.',
-      confirmButtonColor: '#f39c12'
-    });
-  }
 });
     
 // ============================================
@@ -627,26 +597,6 @@ function initializeLazyLoading() {
     images.forEach(img => imageObserver.observe(img));
 }
     
-// Debounce scroll events for better performance
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-    
-// Apply debouncing to scroll events
-const debouncedScroll = debounce(() => {
-    updateActiveNavLink();
-}, 10);
-    
-window.addEventListener('scroll', debouncedScroll);
-    
 // ============================================
 // Scroll Handlers
 // ============================================
@@ -664,9 +614,19 @@ function initializeScrollHandlers() {
         };
     }
     
+    const backToTopBtn = document.getElementById('back-to-top');
+
     // Apply debouncing to scroll events
     const debouncedScroll = debounce(() => {
         updateActiveNavLink();
+
+        if (backToTopBtn) {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        }
     }, 10);
     
     window.addEventListener('scroll', debouncedScroll);
@@ -681,6 +641,13 @@ function initializeScrollHandlers() {
             heroBackground.style.transform = `translateY(${speed}px)`;
         }
     });
+
+    // Back to Top click handler
+    if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
 }
 
 // ============================================
@@ -689,29 +656,25 @@ function initializeScrollHandlers() {
 function initializeKeyboardNavigation() {
     // Keyboard navigation support
     document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && navMenu.classList.contains('active')) {
-        mobileMenu.classList.remove('active');
-        navMenu.classList.remove('active');
-        document.body.classList.remove('menu-open');
-    }
-});
-    
-// Focus management for mobile menu
-mobileMenu.addEventListener('click', function() {
+        if (e.key === 'Escape') {
+            // Close mobile menu if open
+            if (navMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+                navMenu.classList.remove('active');
+                document.body.classList.remove('menu-open');
+                mobileMenu.setAttribute('aria-expanded', 'false');
+            }
 
-    // Focus management for mobile menu
-    mobileMenu.addEventListener('click', function() {
-        if (navMenu.classList.contains('active')) {
-            navLinks[0].focus();
+            // Close video modal if open
+            if (videoModal && videoModal.classList.contains('show')) {
+                const frame = videoModal.querySelector('iframe');
+                if (frame) frame.src = '';
+                videoModal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
         }
     });
-    if (e.target.closest('.sermon-image') || e.target.closest('.fa-play-circle')) {
-      const videoId = card.dataset.videoId;
-      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-      modal.classList.add('show');
-    }
-  });
-};
+}
 
 
     // Console welcome message

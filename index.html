@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teleios Church - Therefore let us go unto maturity</title>
+    <meta name="description" content="Teleios Church in Meredale South, Johannesburg is a vibrant multiracial and multigenerational Christian community, dedicated to spiritual maturity through worship, teaching, and fellowship.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Teleios Church - Therefore let us go unto maturity">
+    <meta property="og:description" content="Join Teleios Church, a welcoming community in Johannesburg focused on spiritual growth, biblical teaching, and genuine fellowship.">
+    <meta property="og:url" content="https://teleioscommunity.mn.co/">
+    <meta property="og:image" content="images/teleios.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Teleios Church - Therefore let us go unto maturity">
+    <meta name="twitter:description" content="A vibrant, multiracial and multigenerational church community in Johannesburg, South Africa.">
+    <meta name="twitter:image" content="images/teleios.jpg">
     <link rel="stylesheet" href="styles.css">
     <link rel="shortcut icon" href="images/teleios.jpg" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -37,7 +47,7 @@
                     <a href="#contact" class="nav-link">Contact</a>
                 </li>
             </ul>
-            <div class="nav-toggle" id="mobile-menu">
+            <div class="nav-toggle" id="mobile-menu" role="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-menu" tabindex="0">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -111,7 +121,7 @@
                 </div>
                 <div class="about-image">
                     <div class="image-placeholder">
-                        <img src="" alt="" id="carousel-img">
+                        <img src="" alt="Teleios Church community gathering" id="carousel-img" loading="lazy">
                         <p>Church Community Gathering</p>
                     </div>
                 </div>
@@ -136,7 +146,7 @@
                         <h3>Sunday Worship Service</h3>
                         <p class="event-time"><i class="fas fa-clock"></i> 09:00 AM</p>
                         <p class="event-description">Join us for inspiring worship, community prayer, and biblical teaching.</p>
-                        <a href="#" class="event-link">Learn More</a>
+                        <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Sunday%20Worship%20Service&details=Join%20us%20for%20inspiring%20worship%2C%20community%20prayer%2C%20and%20biblical%20teaching.&location=Teleios%20Church%2C%2042%20Antrim%20Road%2C%20Meredale%20South%2C%20Johannesburg" class="event-link" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a>
                     </div>
                 </div>
                 <div class="event-card">
@@ -148,7 +158,7 @@
                         <h3>Bible Study & Fellowship</h3>
                         <p class="event-time"><i class="fas fa-clock"></i> 7:00 PM</p>
                         <p class="event-description">Deep dive into scripture with interactive discussion and fellowship.</p>
-                        <a href="#" class="event-link">Learn More</a>
+                        <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Bible%20Study%20%26%20Fellowship&details=Deep%20dive%20into%20scripture%20with%20interactive%20discussion%20and%20fellowship.&location=Teleios%20Church%2C%2042%20Antrim%20Road%2C%20Meredale%20South%2C%20Johannesburg" class="event-link" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a>
                     </div>
                 </div>
                 <div class="event-card">
@@ -160,7 +170,7 @@
                         <h3>Christmas Eve Service</h3>
                         <p class="event-time"><i class="fas fa-clock"></i> 6:00 PM</p>
                         <p class="event-description">Celebrate the birth of Christ with carols, candlelight, and communion.</p>
-                        <a href="#" class="event-link">Learn More</a>
+                        <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Christmas%20Eve%20Service&details=Celebrate%20the%20birth%20of%20Christ%20with%20carols%2C%20candlelight%2C%20and%20communion.&location=Teleios%20Church%2C%2042%20Antrim%20Road%2C%20Meredale%20South%2C%20Johannesburg" class="event-link" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a>
                     </div>
                 </div>
             </div>
@@ -232,13 +242,13 @@
             </div>
         </div>
     </section>
-    <!-- Lightbox Modal -->
-<div id="videoModal" class="modal">
-  <div class="modal-content">
-    <span id="closeModal">&times;</span>
-    <iframe id="videoIframe" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-  </div>
-</div>
+    <!-- Video Modal -->
+    <div id="videoModal" class="modal" role="dialog" aria-modal="true" aria-label="Sermon video player">
+      <div class="modal-content">
+        <span id="closeModal" role="button" aria-label="Close video modal" tabindex="0">&times;</span>
+        <iframe id="videoIframe" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+    </div>
 
     <!-- Community Section -->
     <section id="community" class="community">
@@ -362,6 +372,28 @@
                         <button type="submit" class="btn btn-primary">Send Message</button>
                     </form>
                 </div>
+                <div class="contact-form-container">
+                    <form class="contact-form" action="https://formspree.io/f/xeozbzbn" id="prayer-form" method="POST">
+                        <h3>Submit a Prayer Request</h3>
+                        <div class="form-group">
+                            <input type="text" id="prayer-name" name="name">
+                            <label for="prayer-name">Your Name (optional)</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="prayer-email" name="email">
+                            <label for="prayer-email">Your Email (optional)</label>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="prayer-request" name="prayer_request" rows="5" required></textarea>
+                            <label for="prayer-request">Your Prayer Request</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="prayer-preference" name="preference">
+                            <label for="prayer-preference">Share with church or pastors only?</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Prayer Request</button>
+                    </form>
+                </div>
             </div>
             <div class="map-container">
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3577.5196614853085!2d27.9677371!3d-26.277248600000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1e950fa8384086e7%3A0x3ea99d42614b0ffb!2sTeleios%20Church!5e0!3m2!1sen!2sza!4v1754727857644!5m2!1sen!2sza" 
@@ -376,26 +408,19 @@
             </div>
         </div>
     </section>
-      <!-- Video Modal -->
-<div id="videoModal" class="video-modal">
-  <div class="video-modal-content">
-    <span id="closeModal" class="close">&times;</span>
-    <iframe id="sermonVideo" width="560" height="315" 
-        src="" 
-        title="YouTube video player" 
-        frameborder="0" 
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-        allowfullscreen>
-    </iframe>
-  </div>
-</div>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
                     <div class="nav-logo">
-                <img src="images/teleios.jpg" alt="teleios-church">
+                <img src="images/teleios.jpg" alt="teleios-church" loading="lazy">
             </div>
                     <h3>Teleios Church</h3>
                     <p>"Therefore let us go unto maturity" - Hebrews 6:1</p>
@@ -431,74 +456,10 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 Teleios Church. All rights reserved. Built with love for our community by LintEdge.</p>
+                <p>&copy; 2025 Teleios Church. All rights reserved. Built with love for our community.</p>
             </div>
         </div>
     </footer>
-     <script>
-        //=======================================
-        //navbar community anchor tag redirection
-        //=======================================
-    const communityAnchorTag = document.getElementById('community')
-    communityAnchorTag.addEventListener('click', function(e){
-        console.log('Community link has been clicked')
-        window.open(this.href,"_blank");//this open the link in the new tab
-    })
-
-        //video functionality
-const modal = document.getElementById('videoModal');
-// Open modal when clicking the play icon or Video button
-document.querySelectorAll('.sermon-card').forEach(card => {
-  // select the play icon inside the card
-  const playIcon = card.querySelector('.fa-play-circle');
-  const videoBtn = card.querySelector('.btn-video');
-
-  // If the play icon exists, add click listener
-  if (playIcon) {
-    playIcon.addEventListener('click', () => {
-      const videoId = card.dataset.videoId;
-      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-      modal.classList.add('show');
-    });
-  }
-
-  // Also allow the "Video" button to open the modal
-  if (videoBtn) {
-    videoBtn.addEventListener('click', () => {
-      const videoId = card.dataset.videoId;
-      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-      modal.classList.add('show');
-    });
-  }
-});
-
-// Close modal function
-function closeModal() {
-  modal.classList.remove('show');
-  setTimeout(() => {
-    iframe.src = ''; // stop video
-    modal.style.display = 'none';
-  }, 400); // match CSS transition
-}
-
-
-
-// Click outside modal to close
-window.addEventListener('click', (e) => {
-  if (e.target === modal) {
-    closeModal();
-  }
-});
-
-// Ensure proper display after fade
-modal.addEventListener('transitionend', () => {
-  if (modal.classList.contains('show')) {
-    modal.style.display = 'block';
-  } else {
-    modal.style.display = 'none';
-  }
-});
-</script>
     <script src="script.js"></script>
 </body>
 </html>

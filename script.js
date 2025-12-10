@@ -621,7 +621,7 @@ function initializeScrollHandlers() {
         updateActiveNavLink();
 
         if (backToTopBtn) {
-            if (window.scrollY > 300) {
+            if (window.scrollY > 200) {
                 backToTopBtn.classList.add('show');
             } else {
                 backToTopBtn.classList.remove('show');

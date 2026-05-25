@@ -6,41 +6,42 @@
 }
 
 :root {
-    /* Teleios Church Brand Colors */
-    --church-blue: #77BEF0;
-    --church-yellow: #FFE100;
-    --deep-blue: #4A90E2;
-    --light-blue: #A5D1F7;
-    --warm-yellow: #FFE866;
-    --light-yellow: #FFF5B3;
-    --soft-cream: #f8f5f0;
-    --warm-white: #fefcf8;
-    --dark-text: #2c2c2c;
-    --medium-text: #555;
-    --light-text: #777;
-    --accent-blue: #5BA7F0;
+    /* Premium "Sacred Sophistication" Brand System */
+    --church-blue: #1B263B;        /* Imperial Sapphire */
+    --church-yellow: #D4AF37;      /* Brushed Gold */
+    --deep-blue: #0D1B2A;          /* Sacred Navy */
+    --light-blue: #E9D8A6;         /* Muted Champagne */
+    --warm-yellow: #C5A880;        /* Antique Gold */
+    --light-yellow: #FAF9F6;       /* Oyster Silk */
+    --soft-cream: #FAF9F6;         /* Oyster Silk */
+    --warm-white: #FCFBF9;         /* Warm Pure White */
+    --dark-text: #222222;          /* Charcoal Pearl */
+    --medium-text: #4F5D75;        /* Slate Muted Text */
+    --light-text: #7A8C9E;         /* Light Slate Muted Text */
+    --accent-blue: #E9D8A6;        /* Light accent */
+    --accent-red: #D9383A;         /* Rich Crimson */
     
     /* Legacy color mappings for smooth transition */
-    --primary-gold: #FFE100;
-    --warm-orange: #FFE866;
+    --primary-gold: #D4AF37;       /* Gold */
+    --warm-orange: #C5A880;        /* Muted Gold */
     
     /* Typography */
     --font-primary: 'Playfair Display', serif;
     --font-secondary: 'Inter', sans-serif;
     
     /* Spacing */
-    --section-padding: 80px 0;
-    --container-padding: 0 20px;
-    --border-radius: 12px;
+    --section-padding: 90px 0;
+    --container-padding: 0 24px;
+    --border-radius: 16px;         /* slightly rounder for premium modern cards */
     
     /* Shadows */
-    --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
-    --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
-    --shadow-heavy: 0 15px 40px rgba(0, 0, 0, 0.15);
+    --shadow-light: 0 10px 30px rgba(13, 27, 42, 0.04);
+    --shadow-medium: 0 20px 40px rgba(13, 27, 42, 0.08);
+    --shadow-heavy: 0 30px 60px rgba(13, 27, 42, 0.12);
     
     /* Transitions */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* premium ease-out-expo */
+    --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 html {
@@ -250,25 +251,28 @@ p {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--church-blue), var(--deep-blue));
-    color: white;
-    box-shadow: var(--shadow-light);
+    background: linear-gradient(135deg, var(--church-yellow), var(--warm-yellow));
+    color: var(--deep-blue);
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+    background: linear-gradient(135deg, var(--warm-yellow), var(--church-yellow));
 }
 
 .btn-secondary {
     background: transparent;
-    color: var(--church-yellow);
-    border-color: var(--church-yellow);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
 .btn-secondary:hover {
-    background: var(--church-yellow);
-    color: var(--dark-text);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: white;
     transform: translateY(-2px);
 }
 
@@ -324,15 +328,17 @@ p {
     position: fixed;
     top: 0;
     width: 100%;
-    background: rgba(248, 245, 240, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+    background: rgba(250, 249, 246, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
     z-index: 1000;
     transition: var(--transition-smooth);
 }
 
 .navbar.scrolled {
-    background: rgba(248, 245, 240, 0.98);
+    background: rgba(250, 249, 246, 0.90);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.25);
     box-shadow: var(--shadow-light);
 }
 
@@ -506,10 +512,10 @@ p {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, rgba(13, 27, 42, 0.65), rgba(27, 38, 59, 0.5));
     z-index: 0;
-     animation: fadeIn 1.5s ease-out forwards;
-  animation-delay: 0.3s;
+    animation: fadeIn 1.5s ease-out forwards;
+    animation-delay: 0.3s;
 }
 
 .hero-content {
@@ -521,7 +527,7 @@ p {
     max-width: 800px;
     padding: 0 20px;
     animation: fadeIn 1.2s ease-out forwards;
-  animation-delay: 0.6s;
+    animation-delay: 0.6s;
 }
 
 .hero-title {
@@ -539,14 +545,16 @@ p {
 
 .hero-verse {
     font-family: var(--font-primary);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-style: italic;
     margin: 30px 0;
-    padding: 20px;
-    border-left: 4px solid var(--church-yellow);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(0.7px);
+    padding: 24px 30px;
+    border-left: 3px solid var(--church-yellow);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: var(--border-radius);
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
     animation: fadeInUp 1s ease-out 0.4s both;
 }
 
@@ -713,14 +721,15 @@ p {
     border-radius: var(--border-radius);
     padding: 30px;
     box-shadow: var(--shadow-light);
+    border: 1px solid rgba(13, 27, 42, 0.04);
     transition: var(--transition-smooth);
     display: flex;
     gap: 20px;
 }
 
 .event-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-medium);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(13, 27, 42, 0.08), 0 0 0 1px rgba(212, 175, 55, 0.2);
 }
 
 .event-date {
@@ -798,18 +807,19 @@ p {
     border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: var(--shadow-light);
+    border: 1px solid rgba(13, 27, 42, 0.04);
     transition: var(--transition-smooth);
 }
 
 .sermon-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-medium);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(13, 27, 42, 0.08), 0 0 0 1px rgba(212, 175, 55, 0.2);
 }
 
 .sermon-image {
     position: relative;
     height: 200px;
-    background: linear-gradient(135deg, var(--church-blue), var(--church-yellow));
+    background: linear-gradient(135deg, var(--church-blue), var(--deep-blue));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -962,18 +972,21 @@ p {
 }
 
 .ministry-card {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
     padding: 30px;
     border-radius: var(--border-radius);
     text-align: center;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     transition: var(--transition-smooth);
 }
 
 .ministry-card:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-6px) scale(1.02);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(212, 175, 55, 0.35);
+    box-shadow: 0 20px 40px rgba(13, 27, 42, 0.15);
 }
 
 .ministry-card i {
@@ -1232,6 +1245,271 @@ p {
     }
 }
 
+/* Sermon Controls & Filter Pill Tags */
+.sermon-controls {
+    margin: 0 auto 40px;
+    text-align: center;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.sermon-search-box {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+}
+
+.sermon-search-box input {
+    width: 100%;
+    padding: 14px 20px 14px 48px;
+    border: 2.5px solid rgba(13, 27, 42, 0.06);
+    border-radius: 30px;
+    font-size: 1rem;
+    background: white;
+    transition: var(--transition-smooth);
+    color: var(--dark-text);
+}
+
+.sermon-search-box input:focus {
+    outline: none;
+    border-color: var(--church-yellow);
+    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.12);
+}
+
+.sermon-search-box .search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--church-yellow);
+    font-size: 1.1rem;
+}
+
+.sermon-filter-tags {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-tag {
+    background: white;
+    border: 1px solid rgba(13, 27, 42, 0.08);
+    color: var(--medium-text);
+    padding: 10px 22px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: var(--font-secondary);
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: var(--transition-smooth);
+}
+
+.filter-tag:hover {
+    background: rgba(212, 175, 55, 0.05);
+    border-color: var(--church-yellow);
+    color: var(--deep-blue);
+    transform: translateY(-1px);
+}
+
+.filter-tag.active {
+    background: var(--church-yellow);
+    color: var(--deep-blue);
+    border-color: var(--church-yellow);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+}
+
+.sermon-card {
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.sermon-card.hiding {
+    opacity: 0;
+    transform: scale(0.94);
+    pointer-events: none;
+}
+
+.sermon-card.hidden {
+    display: none;
+}
+
+/* Giving Section */
+.giving {
+    padding: var(--section-padding);
+    background: linear-gradient(135deg, var(--soft-cream), var(--warm-white));
+}
+
+.giving-content {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 40px;
+    align-items: stretch;
+    margin-top: 40px;
+}
+
+.giving-card-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.giving-portal-card {
+    background: white;
+    padding: 35px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    border: 1px solid rgba(13, 27, 42, 0.04);
+    transition: var(--transition-smooth);
+}
+
+.giving-portal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.portal-icon {
+    font-size: 2.5rem;
+    color: var(--church-yellow);
+    margin-bottom: 20px;
+}
+
+.giving-portal-card h3 {
+    color: var(--deep-blue);
+    margin-bottom: 12px;
+}
+
+.giving-portal-card p {
+    color: var(--medium-text);
+    margin-bottom: 25px;
+    font-size: 1rem;
+}
+
+.btn-portal {
+    display: inline-block;
+    width: auto;
+}
+
+/* EFT Bank Details Card */
+.bank-details-card {
+    background: var(--church-blue); /* Royal Sapphire */
+    color: white;
+    padding: 40px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.bank-details-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.bank-badge {
+    align-self: flex-start;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid var(--church-yellow);
+    color: var(--light-blue);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+
+.bank-details-card h3 {
+    color: var(--light-yellow);
+    margin-bottom: 12px;
+}
+
+.bank-details-card p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+}
+
+.bank-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 35px;
+}
+
+.bank-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bank-field:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.field-label {
+    color: var(--light-blue);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.field-value {
+    color: white;
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-align: right;
+}
+
+#acc-num-text {
+    font-family: var(--font-secondary);
+    letter-spacing: 0.5px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.btn-copy {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--border-radius);
+    background: var(--church-yellow);
+    color: var(--deep-blue);
+    border: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.15);
+    transition: var(--transition-smooth);
+    margin-top: auto;
+}
+
+.btn-copy:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+    background: white;
+    color: var(--deep-blue);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     :root {
@@ -1319,6 +1597,11 @@ p {
         grid-template-columns: 1fr;
     }
     
+    .giving-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
     .contact-content {
         grid-template-columns: 1fr;
         gap: 40px;
@@ -1361,7 +1644,9 @@ p {
     .sermon-card,
     .ministry-card,
     .contact-card,
-    .contact-form-container {
+    .contact-form-container,
+    .giving-portal-card,
+    .bank-details-card {
         padding: 20px;
     }
     

@@ -44,6 +44,9 @@
                     <a id="community" href="https://teleioscommunity.mn.co/" class="nav-link" target="_blank">Community</a>
                 </li>
                 <li class="nav-item">
+                    <a href="#giving" class="nav-link">Giving</a>
+                </li>
+                <li class="nav-item">
                     <a href="#contact" class="nav-link">Contact</a>
                 </li>
             </ul>
@@ -121,7 +124,7 @@
                 </div>
                 <div class="about-image">
                     <div class="image-placeholder">
-                        <img src="" alt="Teleios Church community gathering" id="carousel-img" loading="lazy">
+                        <img src="images/t2.jpg" alt="Teleios Church community gathering" id="carousel-img" loading="lazy">
                         <p>Church Community Gathering</p>
                     </div>
                 </div>
@@ -183,6 +186,19 @@
             <div class="section-header">
                 <h2 class="section-title">Sermons</h2>
                 <p class="section-subtitle">Growing in wisdom through God's word</p>
+            </div>
+            <!-- Sermon Filter Controls -->
+            <div class="sermon-controls">
+                <div class="sermon-search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="sermon-search" placeholder="Search by topic, speaker, or title...">
+                </div>
+                <div class="sermon-filter-tags">
+                    <button class="filter-tag active" data-filter="all">All Sermons</button>
+                    <button class="filter-tag" data-filter="Sister Natalie">Sister Natalie</button>
+                    <button class="filter-tag" data-filter="Apostle Brandon">Apostle Brandon</button>
+                    <button class="filter-tag" data-filter="Brother Matthew">Brother Matthew</button>
+                </div>
             </div>
             <div class="sermons-grid">
                 <div class="sermon-card" data-video-id="4138MLHb63E">
@@ -312,6 +328,66 @@
         </div>
     </section>
 
+    <!-- Giving Section -->
+    <section id="giving" class="giving">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Support Our Mission</h2>
+                <p class="section-subtitle">"Every man according as he purposeth in his heart, so let him give... for God loveth a cheerful giver." - 2 Corinthians 9:7</p>
+            </div>
+            <div class="giving-content">
+                <!-- Online Giving Portals -->
+                <div class="giving-card-container">
+                    <div class="giving-portal-card">
+                        <div class="portal-icon"><i class="fas fa-credit-card"></i></div>
+                        <h3>Direct Card Payment</h3>
+                        <p>Securely give tithes, offerings, or direct contributions via credit card or instant EFT using our secure payment portal.</p>
+                        <a href="https://payfast.co.za" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-portal">Give Online Securely</a>
+                    </div>
+                    <div class="giving-portal-card">
+                        <div class="portal-icon"><i class="fab fa-paypal"></i></div>
+                        <h3>International Giving</h3>
+                        <p>For international members and global partners, you can give securely via PayPal using currencies from around the world.</p>
+                        <a href="https://paypal.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-portal">Give via PayPal</a>
+                    </div>
+                </div>
+
+                <!-- EFT Banking Details Card -->
+                <div class="bank-details-card">
+                    <div class="bank-badge">EFT Bank Transfer</div>
+                    <h3>Direct EFT Details</h3>
+                    <p>You can also transfer directly from your banking application to our main church accounts. Please use copy triggers below for accuracy.</p>
+                    
+                    <div class="bank-fields">
+                        <div class="bank-field">
+                            <span class="field-label">Bank Name</span>
+                            <span class="field-value">First National Bank (FNB)</span>
+                        </div>
+                        <div class="bank-field">
+                            <span class="field-label">Account Holder</span>
+                            <span class="field-value">Teleios Church SA</span>
+                        </div>
+                        <div class="bank-field">
+                            <span class="field-label">Account Number</span>
+                            <span class="field-value" id="acc-num-text">62123456789</span>
+                        </div>
+                        <div class="bank-field">
+                            <span class="field-label">Branch Code</span>
+                            <span class="field-value">250655</span>
+                        </div>
+                        <div class="bank-field">
+                            <span class="field-label">Reference</span>
+                            <span class="field-value">Tithes / Offering</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-copy" id="btn-copy-acc">
+                        <i class="fas fa-copy"></i> Copy Account Number
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact Section -->
     <section id="contact" class="contact">
         <div class="container">
@@ -436,6 +512,7 @@
                         <li><a href="#events">Events</a></li>
                         <li><a href="#sermons">Sermons</a></li>
                         <li><a href="#community">Ministries</a></li>
+                        <li><a href="#giving">Giving</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">

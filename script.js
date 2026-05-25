@@ -26,10 +26,18 @@ const carouselImages = [
 ]
 let index= 0;
 
-function displayPictures(){
-const imagePath =document.getElementById('carousel-img');
-imagePath.src= carouselImages[index]
-index= (index+1)%carouselImages.length
+function displayPictures() {
+    const imagePath = document.getElementById('carousel-img');
+    if (!imagePath) return;
+    
+    // Smooth transition
+    imagePath.style.opacity = '0.3';
+    
+    setTimeout(() => {
+        imagePath.src = carouselImages[index];
+        imagePath.style.opacity = '1';
+        index = (index + 1) % carouselImages.length;
+    }, 300);
 }
 displayPictures();
 setInterval(displayPictures, 2000)
@@ -140,6 +148,8 @@ document.addEventListener('DOMContentLoaded', function() {
     updateActiveNavLink();
     initializeScrollHandlers();
     initializeKeyboardNavigation();
+    initializeSermonFilters();
+    initializeGivingPortal();
     
     // Add loading complete class to body
     setTimeout(() => {
@@ -311,31 +321,9 @@ function initializeNavigation() {
     }
 
     // ============================================
-    // Sermon Media Players
+    // Sermon Media Players (Refactored)
     // ============================================
-    
-    const sermonPlayBtns = document.querySelectorAll('.sermon-play-btn');
-    
-    sermonPlayBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Simulate media player interaction
-            this.innerHTML = '<i class="fas fa-pause"></i>';
-            this.style.background = 'var(--primary-gold)';
-            this.style.color = 'white';
-            
-            // Show notification
-            showNotification('Playing sermon...', 'info');
-            
-            // Reset after 3 seconds (simulate)
-            setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-play"></i>';
-                this.style.background = 'rgba(255, 255, 255, 0.9)';
-                this.style.color = 'var(--deep-blue)';
-            }, 3000);
-        });
-    });
-    
-    // Video button initialization is handled in initializeVideoModal()
+    // Audio sermons are disabled. All media plays via video modal triggers.
 }
 
 // ============================================
@@ -564,8 +552,6 @@ function setThemeColor() {
 // Performance Optimization
 // ============================================
 function initializeLazyLoading() {
-    
-    // Lazy loading for images (when actual images are added)
     const images = document.querySelectorAll('img[data-src]');
     if (images.length === 0) return;
     
@@ -578,21 +564,7 @@ function initializeLazyLoading() {
                 observer.unobserve(img);
             }
         });
-    });
-    
-    images.forEach(img => imageObserver.observe(img));
-}
-    const images = document.querySelectorAll('img[data-src]');
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.classList.remove('lazy');
-                imageObserver.unobserve(img);
-            }
-        });
-    });
+    }, { rootMargin: '0px 0px 200px 0px' });
     
     images.forEach(img => imageObserver.observe(img));
 }
@@ -688,5 +660,144 @@ function initializeKeyboardNavigation() {
     Website loaded successfully! 
     Built with love for our community.
     `);
+
+// ============================================
+// Sermon Filter & Search Hub (Option C)
+// ============================================
+function initializeSermonFilters() {
+    const searchInput = document.getElementById('sermon-search');
+    const filterTags  = document.querySelectorAll('.filter-tag');
+    const sermonCards = document.querySelectorAll('.sermon-card');
+    const sermonsGrid = document.querySelector('.sermons-grid');
+
+    if (!searchInput || !filterTags.length || !sermonCards.length) return;
+
+    let activeFilter = 'all';
+
+    // Make the grid a positioning context for the .hide trick
+    if (sermonsGrid) sermonsGrid.style.position = 'relative';
+
+    function applyFilters() {
+        const query = searchInput.value.toLowerCase().trim();
+
+        sermonCards.forEach(card => {
+            const title       = (card.querySelector('h3')?.textContent || '').toLowerCase();
+            const speaker     = (card.querySelector('.sermon-speaker')?.textContent || '').toLowerCase();
+            const description = (card.querySelector('.sermon-description')?.textContent || '').toLowerCase();
+
+            const matchesSearch = !query || title.includes(query) || speaker.includes(query) || description.includes(query);
+            const matchesTag    = activeFilter === 'all' || speaker.includes(activeFilter.toLowerCase());
+
+            if (matchesSearch && matchesTag) {
+                card.classList.remove('hide');
+            } else {
+                card.classList.add('hide');
+            }
+        });
+
+        // Show "no results" message if every card is hidden
+        const visibleCards = [...sermonCards].filter(c => !c.classList.contains('hide'));
+        let noResults = document.getElementById('sermon-no-results');
+
+        if (visibleCards.length === 0) {
+            if (!noResults) {
+                noResults = document.createElement('p');
+                noResults.id = 'sermon-no-results';
+                noResults.style.cssText = `
+                    text-align: center;
+                    color: var(--medium-text);
+                    font-size: 1.1rem;
+                    padding: 40px;
+                    grid-column: 1 / -1;
+                `;
+                noResults.textContent = 'No sermons found. Try a different search or filter.';
+                sermonsGrid.appendChild(noResults);
+            }
+        } else if (noResults) {
+            noResults.remove();
+        }
+    }
+
+    // Live search listener (debounced for performance)
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(applyFilters, 200);
+    });
+
+    // Speaker tag filter listeners
+    filterTags.forEach(tag => {
+        tag.addEventListener('click', () => {
+            filterTags.forEach(t => t.classList.remove('active'));
+            tag.classList.add('active');
+            activeFilter = tag.getAttribute('data-filter');
+
+            // Clear the search input when a speaker tag is clicked
+            searchInput.value = '';
+            applyFilters();
+        });
+    });
+}
+
+// ============================================
+// Giving Portal — Copy to Clipboard (Option B)
+// ============================================
+function initializeGivingPortal() {
+    const copyBtn  = document.getElementById('btn-copy-acc');
+    const accNumEl = document.getElementById('acc-num-text');
+
+    if (!copyBtn || !accNumEl) return;
+
+    copyBtn.addEventListener('click', async () => {
+        const accNumber = accNumEl.textContent.trim();
+
+        try {
+            await navigator.clipboard.writeText(accNumber);
+
+            // SweetAlert2 toast — premium gold-themed
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: `<span style="font-size:0.95rem;">Account number <strong>${accNumber}</strong> copied!</span>`,
+                showConfirmButton: false,
+                timer: 3500,
+                timerProgressBar: true,
+                background: '#0D1B2A',
+                color: '#FAF9F6',
+                iconColor: '#D4AF37',
+                customClass: {
+                    popup: 'swal-toast-custom'
+                }
+            });
+
+            // Visual feedback on the button itself
+            const originalContent = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            copyBtn.style.background = '#2ecc71';
+            copyBtn.style.color = 'white';
+
+            setTimeout(() => {
+                copyBtn.innerHTML = originalContent;
+                copyBtn.style.background = '';
+                copyBtn.style.color = '';
+            }, 2500);
+
+        } catch (err) {
+            // Fallback for browsers that deny clipboard API
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'warning',
+                title: 'Could not copy automatically.',
+                text: `Please copy manually: ${accNumber}`,
+                showConfirmButton: true,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#D4AF37'
+            });
+        }
+    });
+}
+
 
 

@@ -5,7 +5,8 @@
     const config = window.TELEIOS_CONFIG || {};
     const CHANNEL_ID = config.youtubeChannelId || 'UCIqka1KcckcYRK3DXynQbiw';
     const CHANNEL_URL = config.youtubeChannelUrl || `https://www.youtube.com/channel/${CHANNEL_ID}`;
-    const MAX_VIDEOS = config.youtubeMaxVideos || 9;
+    const MAX_VIDEOS = config.youtubeMaxVideos || 50;
+    const API_KEY = config.youtubeApiKey || null;
 
     const FALLBACK_SERMONS = [
         {
@@ -67,6 +68,55 @@
     }
 
     async function fetchYouTubeVideos() {
+        const cacheKey = 'teleios_sermons_cache';
+        const cacheTimeKey = 'teleios_sermons_cache_time';
+        const cacheDuration = 1000 * 60 * 60; // 1 hour
+
+        // Try to load from cache first
+        try {
+            const cachedTime = localStorage.getItem(cacheTimeKey);
+            const cachedData = localStorage.getItem(cacheKey);
+            if (cachedTime && cachedData && (Date.now() - parseInt(cachedTime)) < cacheDuration) {
+                return JSON.parse(cachedData);
+            }
+        } catch(e) {}
+
+        if (API_KEY) {
+            // First try to get the 'uploads' playlist ID by replacing UC with UU
+            const uploadsPlaylistId = CHANNEL_ID.replace(/^UC/, 'UU');
+            const apiUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=${MAX_VIDEOS}&key=${API_KEY}`;
+            
+            try {
+                const response = await fetch(apiUrl);
+                if (response.ok) {
+                    const data = await response.json();
+                    const parsed = data.items.map(item => {
+                        const snippet = item.snippet;
+                        let description = snippet.description || '';
+                        if (description.length > 180) {
+                            description = `${description.slice(0, 177)}…`;
+                        }
+                        return {
+                            videoId: snippet.resourceId.videoId,
+                            title: snippet.title,
+                            published: snippet.publishedAt,
+                            speaker: 'Teleios Church',
+                            description: description
+                        };
+                    });
+                    
+                    try {
+                        localStorage.setItem(cacheKey, JSON.stringify(parsed));
+                        localStorage.setItem(cacheTimeKey, Date.now().toString());
+                    } catch(e) {}
+                    
+                    if (parsed && parsed.length) return parsed;
+                }
+            } catch (err) {
+                console.warn('YouTube API fetch failed, falling back to RSS:', err);
+            }
+        }
+
         const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
         const proxies = [
             `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`,

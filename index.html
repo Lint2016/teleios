@@ -8,19 +8,66 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="Teleios Church - Therefore let us go unto maturity">
     <meta property="og:description" content="Join Teleios Church, a welcoming community in Johannesburg focused on spiritual growth, biblical teaching, and genuine fellowship.">
-    <meta property="og:url" content="https://teleioscommunity.mn.co/">
-    <meta property="og:image" content="images/teleios.jpg">
+    <meta property="og:url" content="https://teleioschurch.co.za/">
+    <meta property="og:image" content="https://teleioschurch.co.za/images/teleios.jpg">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Teleios Church - Therefore let us go unto maturity">
     <meta name="twitter:description" content="A vibrant, multiracial and multigenerational church community in Johannesburg, South Africa.">
-    <meta name="twitter:image" content="images/teleios.jpg">
+    <meta name="twitter:image" content="https://teleioschurch.co.za/images/teleios.jpg">
+    <link rel="canonical" href="https://teleioschurch.co.za/">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
+    <meta name="theme-color" content="#0D1B2A">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="styles.css">
     <link rel="shortcut icon" href="images/teleios.jpg" type="image/x-icon">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="site-config.js" defer></script>
+    <script src="youtube-sermons.js" defer></script>
+    <script src="script.js" defer></script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Church",
+        "name": "Teleios Church",
+        "description": "A vibrant multiracial and multigenerational Christian community in Johannesburg, dedicated to spiritual maturity through worship, teaching, and fellowship.",
+        "url": "https://teleioschurch.co.za/",
+        "logo": "https://teleioschurch.co.za/images/teleios.jpg",
+        "image": "https://teleioschurch.co.za/images/teleios.jpg",
+        "telephone": "+27-67-163-0558",
+        "email": "info@teleioschurch.co.za",
+        "sameAs": [
+            "https://www.youtube.com/channel/UCIqka1KcckcYRK3DXynQbiw",
+            "https://www.facebook.com/share/171Y1Z2fUy/",
+            "https://teleioscommunity.mn.co/"
+        ],
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "42 Antrim Road",
+            "addressLocality": "Meredale South, Johannesburg",
+            "addressCountry": "ZA"
+        },
+        "openingHoursSpecification": [
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Sunday",
+                "opens": "09:00",
+                "closes": "12:00"
+            },
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Wednesday",
+                "opens": "19:00",
+                "closes": "21:00"
+            }
+        ]
+    }
+    </script>
 </head>
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
@@ -35,13 +82,19 @@
                     <a href="#about" class="nav-link">About</a>
                 </li>
                 <li class="nav-item">
+                    <a href="#plan-visit" class="nav-link">Visit</a>
+                </li>
+                <li class="nav-item">
                     <a href="#events" class="nav-link">Events</a>
                 </li>
                 <li class="nav-item">
                     <a href="#sermons" class="nav-link">Sermons</a>
                 </li>
                 <li class="nav-item">
-                    <a id="community" href="https://teleioscommunity.mn.co/" class="nav-link" target="_blank">Community</a>
+                    <a href="#ministries" class="nav-link">Ministries</a>
+                </li>
+                <li class="nav-item">
+                    <a href="https://teleioscommunity.mn.co/" class="nav-link nav-link--external" target="_blank" rel="noopener noreferrer">Connect Online</a>
                 </li>
                 <li class="nav-item">
                     <a href="#giving" class="nav-link">Giving</a>
@@ -58,11 +111,12 @@
         </div>
     </nav>
 
+    <main id="main-content">
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-video-container">
             <div class="hero-overlay"></div>
-            <img src="images/teleiosLeaders.png" alt="Church Leaders" class="hero-image">
+            <img src="images/teleiosLeaders.png" alt="Church Leaders" class="hero-image" width="1920" height="1080" fetchpriority="high" decoding="async">
         </div>
         <div class="hero-content">
             <div class="hero-text">
@@ -73,8 +127,8 @@
                     <cite>- Hebrews 6:1</cite>
                 </blockquote>
                 <div class="hero-buttons">
-                    <a href="#about" class="btn btn-primary">Join Us This Sunday</a>
-                    <a href="https://teleioscommunity.mn.co/" class="btn btn-secondary" target="_blank">Watch Online</a>
+                    <a href="#plan-visit" class="btn btn-primary">Join Us This Sunday</a>
+                    <a href="https://www.youtube.com/channel/UCIqka1KcckcYRK3DXynQbiw" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>
                 </div>
             </div>
         </div>
@@ -132,6 +186,80 @@
         </div>
     </section>
 
+    <!-- Plan Your Visit -->
+    <section id="plan-visit" class="plan-visit">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Plan Your Visit</h2>
+                <p class="section-subtitle">First time with us? Here is everything you need to feel at home.</p>
+            </div>
+
+            <div class="visit-highlight">
+                <div class="visit-highlight__item">
+                    <i class="fas fa-calendar-day" aria-hidden="true"></i>
+                    <div>
+                        <strong>Sunday Worship</strong>
+                        <span>09:00 AM</span>
+                    </div>
+                </div>
+                <div class="visit-highlight__item">
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                    <div>
+                        <strong>Location</strong>
+                        <span>42 Antrim Road, Meredale South, Johannesburg</span>
+                    </div>
+                </div>
+                <div class="visit-highlight__item">
+                    <i class="fas fa-hourglass-half" aria-hidden="true"></i>
+                    <div>
+                        <strong>Service length</strong>
+                        <span>About 90 minutes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visit-grid">
+                <article class="visit-card">
+                    <i class="fas fa-door-open" aria-hidden="true"></i>
+                    <h3>When you arrive</h3>
+                    <p>We recommend arriving 10–15 minutes early. You will be warmly greeted at the door and can find a seat in the main auditorium. Ushers are happy to help if you need anything.</p>
+                </article>
+                <article class="visit-card">
+                    <i class="fas fa-tshirt" aria-hidden="true"></i>
+                    <h3>What to wear</h3>
+                    <p>Come as you are. Some people dress formally and others casually — you are welcome either way. We care far more about your presence than your outfit.</p>
+                </article>
+                <article class="visit-card">
+                    <i class="fas fa-child" aria-hidden="true"></i>
+                    <h3>Children &amp; families</h3>
+                    <p>Families are welcome. Children&apos;s ministry is available during Sunday service. Let a greeter know you have kids and they will point you to the right area.</p>
+                </article>
+                <article class="visit-card">
+                    <i class="fas fa-parking" aria-hidden="true"></i>
+                    <h3>Parking</h3>
+                    <p>Street and nearby parking is available around the church. If you need assistance finding a spot, ask one of our greeters when you arrive.</p>
+                </article>
+                <article class="visit-card">
+                    <i class="fas fa-hands-praying" aria-hidden="true"></i>
+                    <h3>What to expect</h3>
+                    <p>A typical Sunday includes worship, prayer, biblical teaching, and time to connect. We are a multiracial, multigenerational family — expect a warm, reverent, and joyful atmosphere.</p>
+                </article>
+                <article class="visit-card">
+                    <i class="fas fa-mug-hot" aria-hidden="true"></i>
+                    <h3>After the service</h3>
+                    <p>Stay for fellowship if you can. Introduce yourself to a leader or greeter — we would love to meet you, answer questions, and help you get connected.</p>
+                </article>
+            </div>
+
+            <div class="visit-cta">
+                <a href="#contact" class="btn btn-primary">Get directions</a>
+                <a href="https://wa.me/27671630558?text=Hello%20Teleios%20Church%2C%20I%27m%20planning%20my%20first%20visit." class="btn btn-secondary visit-cta__whatsapp" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-whatsapp" aria-hidden="true"></i> Message us before you come
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- Events Section -->
     <section id="events" class="events">
         <div class="container">
@@ -139,43 +267,9 @@
                 <h2 class="section-title">Upcoming Events</h2>
                 <p class="section-subtitle">Join us in fellowship and worship</p>
             </div>
-            <div class="events-grid">
-                <div class="event-card">
-                    <div class="event-date">
-                        <span class="month">Dec</span>
-                        <span class="day">17</span>
-                    </div>
-                    <div class="event-content">
-                        <h3>Sunday Worship Service</h3>
-                        <p class="event-time"><i class="fas fa-clock"></i> 09:00 AM</p>
-                        <p class="event-description">Join us for inspiring worship, community prayer, and biblical teaching.</p>
-                        <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Sunday%20Worship%20Service&details=Join%20us%20for%20inspiring%20worship%2C%20community%20prayer%2C%20and%20biblical%20teaching.&location=Teleios%20Church%2C%2042%20Antrim%20Road%2C%20Meredale%20South%2C%20Johannesburg" class="event-link" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a>
-                    </div>
-                </div>
-                <div class="event-card">
-                    <div class="event-date">
-                        <span class="month">Dec</span>
-                        <span class="day">20</span>
-                    </div>
-                    <div class="event-content">
-                        <h3>Bible Study & Fellowship</h3>
-                        <p class="event-time"><i class="fas fa-clock"></i> 7:00 PM</p>
-                        <p class="event-description">Deep dive into scripture with interactive discussion and fellowship.</p>
-                        <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Bible%20Study%20%26%20Fellowship&details=Deep%20dive%20into%20scripture%20with%20interactive%20discussion%20and%20fellowship.&location=Teleios%20Church%2C%2042%20Antrim%20Road%2C%20Meredale%20South%2C%20Johannesburg" class="event-link" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a>
-                    </div>
-                </div>
-                <div class="event-card">
-                    <div class="event-date">
-                        <span class="month">Dec</span>
-                        <span class="day">24</span>
-                    </div>
-                    <div class="event-content">
-                        <h3>Christmas Eve Service</h3>
-                        <p class="event-time"><i class="fas fa-clock"></i> 6:00 PM</p>
-                        <p class="event-description">Celebrate the birth of Christ with carols, candlelight, and communion.</p>
-                        <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Christmas%20Eve%20Service&details=Celebrate%20the%20birth%20of%20Christ%20with%20carols%2C%20candlelight%2C%20and%20communion.&location=Teleios%20Church%2C%2042%20Antrim%20Road%2C%20Meredale%20South%2C%20Johannesburg" class="event-link" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a>
-                    </div>
-                </div>
+            <div id="google-calendar-embed" class="google-calendar-embed hidden" aria-hidden="true"></div>
+            <div class="events-grid" id="events-grid" aria-live="polite">
+                <p class="events-loading">Loading upcoming events…</p>
             </div>
         </div>
     </section>
@@ -185,76 +279,24 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Sermons</h2>
-                <p class="section-subtitle">Growing in wisdom through God's word</p>
+                <p class="section-subtitle">Latest messages from our YouTube channel</p>
             </div>
-            <!-- Sermon Filter Controls -->
+            <p class="sermons-channel-cta">
+                <a id="sermons-channel-link" href="https://www.youtube.com/channel/UCIqka1KcckcYRK3DXynQbiw" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-youtube" aria-hidden="true"></i> Subscribe on YouTube
+                </a>
+            </p>
             <div class="sermon-controls">
                 <div class="sermon-search-box">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="sermon-search" placeholder="Search by topic, speaker, or title...">
+                    <input type="text" id="sermon-search" placeholder="Search by topic, speaker, or title..." aria-label="Search sermons">
                 </div>
                 <div class="sermon-filter-tags">
-                    <button class="filter-tag active" data-filter="all">All Sermons</button>
-                    <button class="filter-tag" data-filter="Sister Natalie">Sister Natalie</button>
-                    <button class="filter-tag" data-filter="Apostle Brandon">Apostle Brandon</button>
-                    <button class="filter-tag" data-filter="Brother Matthew">Brother Matthew</button>
+                    <button type="button" class="filter-tag active" data-filter="all">All Sermons</button>
                 </div>
             </div>
-            <div class="sermons-grid">
-                <div class="sermon-card" data-video-id="4138MLHb63E">
-                    <div class="sermon-image">
-                        <div class="image-placeholder">
-                            <i class="fas fa-play-circle"></i>
-                        </div>
-                        
-                    </div>
-                    <div class="sermon-content">
-                        <h3>Walking in Spiritual Maturity</h3>
-                        <p class="sermon-date">December 10, 2023</p>
-                        <p class="sermon-speaker">Sister Natalie</p>
-                        <p class="sermon-description">Exploring what it means to grow in spiritual maturity and how we can support each other in this journey.</p>
-                        <div class="sermon-actions">
-                            
-                            <button class="btn btn-video"><i class="fas fa-video"></i> Video</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="sermon-card" data-video-id="B9JkLy2ljTU">
-                    <div class="sermon-image">
-                        <div class="image-placeholder">
-                            <i class="fas fa-play-circle"></i>
-                        </div>
-                        
-                    </div>
-                    <div class="sermon-content">
-                        <h3>Power</h3>
-                        <p class="sermon-date">December 3, 2023</p>
-                        <p class="sermon-speaker">Apostle Brandon</p>
-                        <p class="sermon-description">Celebrating our diverse community while finding strength in our shared faith and common purpose.</p>
-                        <div class="sermon-actions">
-                            
-                            <button class="btn btn-video" id="video-btn"><i class="fas fa-video"></i> Video</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="sermon-card" data-video-id="obMKaZPIWGI">
-                    <div class="sermon-image">
-                        <div class="image-placeholder">
-                            <i class="fas fa-play-circle"></i>
-                        </div>
-                        
-                    </div>
-                    <div class="sermon-content">
-                        <h3>The Heart of Fellowship</h3>
-                        <p class="sermon-date">November 26, 2023</p>
-                        <p class="sermon-speaker">Brother Matthew</p>
-                        <p class="sermon-description">Understanding the biblical foundation of genuine fellowship and how it transforms our community.</p>
-                        <div class="sermon-actions">
-                            
-                            <button class="btn btn-video"><i class="fas fa-video"></i> Video</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="sermons-grid" id="sermons-grid" aria-live="polite">
+                <p class="sermons-loading">Loading sermons from YouTube…</p>
             </div>
         </div>
     </section>
@@ -266,8 +308,8 @@
       </div>
     </div>
 
-    <!-- Community Section -->
-    <section id="community" class="community">
+    <!-- Ministries Section -->
+    <section id="ministries" class="community ministries">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Our Community</h2>
@@ -333,35 +375,34 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Support Our Mission</h2>
-                <p class="section-subtitle">"Every man according as he purposeth in his heart, so let him give... for God loveth a cheerful giver." - 2 Corinthians 9:7</p>
+                <p class="section-subtitle">"Every man according as he purposed in his heart, so let him give... for God loves a cheerful giver." - 2 Corinthians 9:7</p>
             </div>
             <div class="giving-content">
-                <!-- Online Giving Portals -->
-                <div class="giving-card-container">
-                    <div class="giving-portal-card">
-                        <div class="portal-icon"><i class="fas fa-credit-card"></i></div>
-                        <h3>Direct Card Payment</h3>
-                        <p>Securely give tithes, offerings, or direct contributions via credit card or instant EFT using our secure payment portal.</p>
-                        <a href="https://payfast.co.za" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-portal">Give Online Securely</a>
-                    </div>
-                    <div class="giving-portal-card">
-                        <div class="portal-icon"><i class="fab fa-paypal"></i></div>
-                        <h3>International Giving</h3>
-                        <p>For international members and global partners, you can give securely via PayPal using currencies from around the world.</p>
-                        <a href="https://paypal.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-portal">Give via PayPal</a>
-                    </div>
+                <div class="giving-how-to-card">
+                    <div class="portal-icon"><i class="fas fa-university"></i></div>
+                    <h3>Give via EFT</h3>
+                    <p>We currently receive tithes and offerings by <strong>bank transfer (EFT)</strong>. Use your banking app and the details on this page.</p>
+                    <ol class="giving-steps">
+                        <li>Open your bank app and choose <strong>Pay / Transfer</strong>.</li>
+                        <li>Add Teleios Church as a beneficiary using the account details provided.</li>
+                        <li>Use reference <strong>Tithes</strong>, <strong>Offering</strong>, or your name so we can acknowledge your gift.</li>
+                        <li>Confirm the payment — thank you for supporting the ministry.</li>
+                    </ol>
+                    <p class="giving-note">Online card giving (PayFast) may be added later. For questions or international giving, contact us on WhatsApp.</p>
+                    <a href="https://wa.me/27671630558?text=Hello%20Teleios%20Church%2C%20I%20have%20a%20question%20about%20giving." class="btn btn-secondary giving-whatsapp-btn" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-whatsapp"></i> Ask about giving
+                    </a>
                 </div>
 
-                <!-- EFT Banking Details Card -->
                 <div class="bank-details-card">
                     <div class="bank-badge">EFT Bank Transfer</div>
-                    <h3>Direct EFT Details</h3>
-                    <p>You can also transfer directly from your banking application to our main church accounts. Please use copy triggers below for accuracy.</p>
+                    <h3>Banking Details</h3>
+                    <p>Transfer to our Standard Bank account. Tap copy below to avoid typing errors.</p>
                     
                     <div class="bank-fields">
                         <div class="bank-field">
                             <span class="field-label">Bank Name</span>
-                            <span class="field-value">First National Bank (FNB)</span>
+                            <span class="field-value">Standard Bank</span>
                         </div>
                         <div class="bank-field">
                             <span class="field-label">Account Holder</span>
@@ -369,20 +410,29 @@
                         </div>
                         <div class="bank-field">
                             <span class="field-label">Account Number</span>
-                            <span class="field-value" id="acc-num-text">62123456789</span>
+                            <span class="field-value" id="acc-num-text">303046430</span>
                         </div>
                         <div class="bank-field">
                             <span class="field-label">Branch Code</span>
-                            <span class="field-value">250655</span>
+                            <span class="field-value" id="branch-code-text">051001</span>
+                        </div>
+                        <div class="bank-field">
+                            <span class="field-label">Account Type</span>
+                            <span class="field-value">Cheque / Current</span>
                         </div>
                         <div class="bank-field">
                             <span class="field-label">Reference</span>
                             <span class="field-value">Tithes / Offering</span>
                         </div>
                     </div>
-                    <button class="btn btn-primary btn-copy" id="btn-copy-acc">
-                        <i class="fas fa-copy"></i> Copy Account Number
-                    </button>
+                    <div class="bank-copy-actions">
+                        <button type="button" class="btn btn-primary btn-copy" id="btn-copy-acc">
+                            <i class="fas fa-copy"></i> Copy account number
+                        </button>
+                        <button type="button" class="btn btn-primary btn-copy btn-copy-outline" id="btn-copy-all">
+                            <i class="fas fa-clipboard-list"></i> Copy all details
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -414,7 +464,8 @@
                         </div>
                         <div class="contact-item">
                             <i class="fas fa-phone"></i>
-                            <span>+27 11 123 4567</span>
+                            <a href="tel:+27671630558">067 163 0558</a>
+                            <span class="contact-phone-alt">(+27 67 163 0558)</span>
                         </div>
                         <div class="contact-item">
                             <i class="fas fa-envelope"></i>
@@ -445,6 +496,9 @@
                             <textarea id="message"  name="message" rows="5" required></textarea>
                             <label for="message">Your Message</label>
                         </div>
+                        <p class="form-privacy-note">
+                            By submitting, you agree to our <a href="#privacy">privacy notice</a>. We use your details only to respond to you (POPIA).
+                        </p>
                         <button type="submit" class="btn btn-primary">Send Message</button>
                     </form>
                 </div>
@@ -485,6 +539,38 @@
         </div>
     </section>
 
+    <section id="privacy" class="privacy">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Privacy Notice</h2>
+                <p class="section-subtitle">How we handle your information (POPIA, South Africa)</p>
+            </div>
+            <div class="privacy-content">
+                <p>Teleios Church respects your privacy. When you contact us via the website form, WhatsApp, or email, we collect only the information you provide (such as your name, email, and message) so we can respond to you.</p>
+                <ul>
+                    <li>We do not sell your personal information.</li>
+                    <li>We keep messages only as long as needed for pastoral or administrative follow-up.</li>
+                    <li>Form submissions are processed through our form provider (Formspree) under their security practices.</li>
+                    <li>You may request access to or correction of your information by emailing <a href="mailto:info@teleioschurch.co.za">info@teleioschurch.co.za</a> or calling <a href="tel:+27671630558">067 163 0558</a>.</li>
+                </ul>
+                <p class="privacy-updated"><em>Last updated: May 2026</em></p>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <!-- WhatsApp -->
+    <a
+        href="https://wa.me/27671630558?text=Hello%20Teleios%20Church%2C%20I%20would%20like%20to%20get%20in%20touch."
+        class="whatsapp-float"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat with Teleios Church on WhatsApp"
+    >
+        <i class="fab fa-whatsapp" aria-hidden="true"></i>
+        <span class="whatsapp-float__label">WhatsApp</span>
+    </a>
+
     <!-- Back to Top Button -->
     <button id="back-to-top" class="back-to-top" aria-label="Back to top">
         <i class="fas fa-chevron-up"></i>
@@ -502,16 +588,18 @@
                     <p>"Therefore let us go unto maturity" - Hebrews 6:1</p>
                     <div class="social-links">
                         <a href="https://www.facebook.com/share/171Y1Z2fUy/"><i class="fab fa-facebook"></i></a>
-                        <a href="https://www.youtube.com/@teleioschurchsa"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.youtube.com/channel/UCIqka1KcckcYRK3DXynQbiw" target="_blank" rel="noopener noreferrer" aria-label="Teleios Church on YouTube"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
                 <div class="footer-section">
                     <h4>Quick Links</h4>
                     <ul>
                         <li><a href="#about">About Us</a></li>
+                        <li><a href="#plan-visit">Plan Your Visit</a></li>
                         <li><a href="#events">Events</a></li>
                         <li><a href="#sermons">Sermons</a></li>
-                        <li><a href="#community">Ministries</a></li>
+                        <li><a href="#ministries">Ministries</a></li>
+                        <li><a href="#privacy">Privacy</a></li>
                         <li><a href="#giving">Giving</a></li>
                     </ul>
                 </div>
@@ -527,7 +615,7 @@
                     <ul>
                         <li>Teleios Church</li>
                         <li>42 Antrim road, Meredale South Johannesburg, SA</li>
-                        <li>+27 11 123 4567</li>
+                        <li><a href="tel:+27671630558">067 163 0558</a> (+27 67 163 0558)</li>
                         <li>info@teleioschurch.co.za</li>
                     </ul>
                 </div>
@@ -537,19 +625,5 @@
             </div>
         </div>
     </footer>
-    <script src="script.js"></script>
-    <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/68bfeb5934b9b31926877e4c/1j4mqumag';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
 </body>
 </html>

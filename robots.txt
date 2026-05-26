@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://teleioschurch.co.za/sitemap.xml

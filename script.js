@@ -22,25 +22,66 @@ const carouselImages = [
     'images/t19.jpg',
     'images/t20.jpg',
     'images/t21.jpg',
-    'images/t22.jpg'
-]
-let index= 0;
+    'images/t22.jpg',
+    'images/gathering.jpg'
+];
 
-function displayPictures() {
-    const imagePath = document.getElementById('carousel-img');
-    if (!imagePath) return;
-    
-    // Smooth transition
-    imagePath.style.opacity = '0.3';
-    
-    setTimeout(() => {
-        imagePath.src = carouselImages[index];
-        imagePath.style.opacity = '1';
-        index = (index + 1) % carouselImages.length;
-    }, 300);
+function prefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
-displayPictures();
-setInterval(displayPictures, 2000)
+
+function initializeCarousel() {
+    const img = document.getElementById('carousel-img');
+    if (!img || carouselImages.length < 2) return;
+
+    if (prefersReducedMotion()) return;
+
+    let currentIndex = carouselImages.indexOf(img.getAttribute('src') || '');
+    if (currentIndex < 0) currentIndex = 0;
+
+    const fadeMs = 450;
+    const intervalMs = 4000;
+    let timerId = null;
+
+    img.style.transition = `opacity ${fadeMs}ms ease`;
+
+    carouselImages.forEach((src) => {
+        const preload = new Image();
+        preload.src = src;
+    });
+
+    function showNext() {
+        currentIndex = (currentIndex + 1) % carouselImages.length;
+        const nextSrc = carouselImages[currentIndex];
+
+        img.style.opacity = '0';
+
+        window.setTimeout(() => {
+            const onReady = () => {
+                img.style.opacity = '1';
+            };
+
+            img.onload = onReady;
+            img.onerror = onReady;
+            img.src = nextSrc;
+
+            if (img.complete) {
+                onReady();
+            }
+        }, fadeMs);
+    }
+
+    timerId = window.setInterval(showNext, intervalMs);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            window.clearInterval(timerId);
+        } else {
+            window.clearInterval(timerId);
+            timerId = window.setInterval(showNext, intervalMs);
+        }
+    });
+}
 // Global variables
 const navbar = document.getElementById('navbar');
 const mobileMenu = document.getElementById('mobile-menu');
@@ -103,34 +144,34 @@ function initializeVideoModal() {
         }
     });
     
-    // Initialize video buttons
-    const videoButtons = document.querySelectorAll('.btn-video');
-    if (videoButtons.length > 0) {
-        videoButtons.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const card = this.closest('.sermon-card');
-                if (!card) {
-                    showNotification('Error: Could not find sermon information', 'error');
-                    return;
-                }
-                
-                const videoId = card.getAttribute('data-video-id');
-                if (!videoId) {
-                    showNotification('Error: No video available', 'error');
-                    return;
-                }
-                
-                const frame = document.getElementById('videoIframe');
-                if (frame) {
-                    frame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0`;
-                    videoModal.classList.add('show');
-                    document.body.style.overflow = 'hidden';
-                    closeBtn.focus();
-                }
-            });
+    function openSermonVideo(card) {
+        if (!card) {
+            showNotification('Error: Could not find sermon information', 'error');
+            return;
+        }
+
+        const videoId = card.getAttribute('data-video-id');
+        if (!videoId) {
+            showNotification('Error: No video available', 'error');
+            return;
+        }
+
+        const frame = document.getElementById('videoIframe');
+        if (frame) {
+            frame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+            videoModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            closeBtn.focus();
+        }
+    }
+
+    const sermonsGrid = document.getElementById('sermons-grid');
+    if (sermonsGrid) {
+        sermonsGrid.addEventListener('click', (e) => {
+            const trigger = e.target.closest('.btn-video, .sermon-play-overlay');
+            if (!trigger || !sermonsGrid.contains(trigger)) return;
+            e.preventDefault();
+            openSermonVideo(trigger.closest('.sermon-card'));
         });
     }
 }
@@ -150,6 +191,13 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeKeyboardNavigation();
     initializeSermonFilters();
     initializeGivingPortal();
+    initializeCarousel();
+    initializeUpcomingEvents();
+    initializeGoogleCalendarEmbed();
+
+    if (typeof initializeYouTubeSermons === 'function') {
+        initializeYouTubeSermons();
+    }
     
     // Add loading complete class to body
     setTimeout(() => {
@@ -227,12 +275,15 @@ function initializeNavigation() {
     // Enhanced smooth scrolling for all anchor links
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (!href || !href.startsWith('#')) return;
+
             e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
+            const targetId = href.substring(1);
             const targetSection = document.getElementById(targetId);
-            
+
             if (targetSection) {
-                const offsetTop = targetSection.offsetTop - 70; // Account for fixed navbar
+                const offsetTop = targetSection.offsetTop - 70;
                 window.scrollTo({
                     top: offsetTop,
                     behavior: 'smooth'
@@ -262,8 +313,9 @@ function initializeNavigation() {
                         entry.target.style.transform = 'translateY(0)';
                         entry.target.style.opacity = '1';
                     }, delay);
-                } else if (entry.target.classList.contains('event-card') || 
-                          entry.target.classList.contains('sermon-card') || 
+                } else if (entry.target.classList.contains('event-card') ||
+                          entry.target.classList.contains('visit-card') ||
+                          entry.target.classList.contains('sermon-card') ||
                           entry.target.classList.contains('ministry-card')) {
                     // Animate other cards with a slight delay
                     const delay = Array.from(entry.target.parentNode.children).indexOf(entry.target) * 150;
@@ -285,7 +337,7 @@ function initializeNavigation() {
     }, observerOptions);
     
     // Observe elements for animation
-    const animateElements = document.querySelectorAll('.value-item, .event-card, .sermon-card, .ministry-card, .stat-item');
+    const animateElements = document.querySelectorAll('.value-item, .visit-card, .event-card, .sermon-card, .ministry-card, .stat-item');
     animateElements.forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
@@ -404,7 +456,8 @@ formInputs.forEach(input => {
         input.parentNode.classList.add('focused');
     }
 });
-    
+}
+
 // ============================================
 // Utility Functions
 // ============================================
@@ -462,41 +515,196 @@ function showNotification(message, type = 'info') {
 }
     
 // ============================================
-// Dynamic Event Loading (Simulation)
+// Upcoming Events (recurring + special)
 // ============================================
-    
-function loadUpcomingEvents() {
-    // This would normally fetch from an API
-    const events = [
-        {
-            date: { month: 'Dec', day: '17' },
-            title: 'Sunday Worship Service',
-            time: '10:00 AM',
-            description: 'Join us for inspiring worship, community prayer, and biblical teaching.'
-        },
-        {
-            date: { month: 'Dec', day: '20' },
-            title: 'Bible Study & Fellowship',
-            time: '7:00 PM',
-            description: 'Deep dive into scripture with interactive discussion and fellowship.'
-        },
-        {
-            date: { month: 'Dec', day: '24' },
-            title: 'Christmas Eve Service',
-            time: '6:00 PM',
-            description: 'Celebrate the birth of Christ with carols, candlelight, and communion.'
-        }
-    ];
-    
-    // Add dynamic behavior to event cards
-    const eventCards = document.querySelectorAll('.event-card');
-    eventCards.forEach((card, index) => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-8px) scale(1.02)';
+
+const CHURCH_LOCATION = 'Teleios Church, 42 Antrim Road, Meredale South, Johannesburg';
+
+const RECURRING_EVENTS = [
+    {
+        id: 'sunday-worship',
+        title: 'Sunday Worship Service',
+        dayOfWeek: 0,
+        hour: 9,
+        minute: 0,
+        durationHours: 2,
+        timeLabel: '09:00 AM',
+        recurringLabel: 'Every Sunday',
+        description: 'Join us for inspiring worship, community prayer, and biblical teaching.'
+    },
+    {
+        id: 'wednesday-bible-study',
+        title: 'Bible Study & Fellowship',
+        dayOfWeek: 3,
+        hour: 19,
+        minute: 0,
+        durationHours: 2,
+        timeLabel: '7:00 PM',
+        recurringLabel: 'Every Wednesday',
+        description: 'Deep dive into scripture with interactive discussion and fellowship.'
+    }
+];
+
+/** Add one-off services here (YYYY-MM-DD, 24h time). Only future dates are shown. */
+const SPECIAL_EVENTS = [
+    {
+        title: 'Good Friday Service',
+        date: '2026-04-03',
+        hour: 18,
+        minute: 0,
+        durationHours: 2,
+        timeLabel: '6:00 PM',
+        description: 'Reflect on the sacrifice of Christ in a solemn, hope-filled gathering.'
+    },
+    {
+        title: 'Easter Sunday Celebration',
+        date: '2026-04-05',
+        hour: 9,
+        minute: 0,
+        durationHours: 2,
+        timeLabel: '09:00 AM',
+        description: 'Celebrate the resurrection with worship, teaching, and joyful fellowship.'
+    },
+    {
+        title: 'Christmas Eve Service',
+        date: '2026-12-24',
+        hour: 18,
+        minute: 0,
+        durationHours: 2,
+        timeLabel: '6:00 PM',
+        description: 'Celebrate the birth of Christ with carols, candlelight, and communion.'
+    }
+];
+
+function getNextOccurrence(dayOfWeek, hour, minute) {
+    const now = new Date();
+    const next = new Date(now);
+    next.setHours(hour, minute, 0, 0);
+
+    const daysUntil = (dayOfWeek - next.getDay() + 7) % 7;
+    if (daysUntil === 0 && next <= now) {
+        next.setDate(next.getDate() + 7);
+    } else {
+        next.setDate(next.getDate() + daysUntil);
+    }
+
+    return next;
+}
+
+function formatCalendarStamp(date) {
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}T${pad(date.getHours())}${pad(date.getMinutes())}00`;
+}
+
+function buildGoogleCalendarUrl(event) {
+    const end = new Date(event.start);
+    end.setHours(end.getHours() + (event.durationHours || 2));
+
+    const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: event.title,
+        details: event.description,
+        location: CHURCH_LOCATION,
+        dates: `${formatCalendarStamp(event.start)}/${formatCalendarStamp(end)}`
+    });
+
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+function buildUpcomingEventsList() {
+    const now = new Date();
+    const items = [];
+
+    RECURRING_EVENTS.forEach((recurring) => {
+        items.push({
+            ...recurring,
+            start: getNextOccurrence(recurring.dayOfWeek, recurring.hour, recurring.minute),
+            isRecurring: true
         });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
+    });
+
+    SPECIAL_EVENTS.forEach((special) => {
+        const [year, month, day] = special.date.split('-').map(Number);
+        const start = new Date(year, month - 1, day, special.hour, special.minute, 0, 0);
+        if (start > now) {
+            items.push({
+                title: special.title,
+                description: special.description,
+                timeLabel: special.timeLabel,
+                durationHours: special.durationHours,
+                start,
+                isRecurring: false
+            });
+        }
+    });
+
+    items.sort((a, b) => a.start - b.start);
+
+    const seen = new Set();
+    const unique = [];
+
+    items.forEach((item) => {
+        const key = `${item.title}-${item.start.toISOString()}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        unique.push(item);
+    });
+
+    return unique.slice(0, 3);
+}
+
+function createEventCard(event) {
+    const card = document.createElement('article');
+    card.className = 'event-card';
+
+    const month = event.start.toLocaleString('en-ZA', { month: 'short' });
+    const day = event.start.getDate();
+    const calendarUrl = buildGoogleCalendarUrl(event);
+    const recurringMarkup = event.isRecurring
+        ? `<p class="event-recurring">${event.recurringLabel}</p>`
+        : '';
+
+    card.innerHTML = `
+        <div class="event-date">
+            <span class="month">${month}</span>
+            <span class="day">${day}</span>
+        </div>
+        <div class="event-content">
+            <h3>${event.title}</h3>
+            ${recurringMarkup}
+            <p class="event-time"><i class="fas fa-clock" aria-hidden="true"></i> ${event.timeLabel}</p>
+            <p class="event-description">${event.description}</p>
+            <a href="${calendarUrl}" class="event-link" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a>
+        </div>
+    `;
+
+    return card;
+}
+
+function initializeUpcomingEvents() {
+    const grid = document.getElementById('events-grid');
+    if (!grid) return;
+
+    const events = buildUpcomingEventsList();
+    grid.innerHTML = '';
+
+    if (events.length === 0) {
+        grid.innerHTML = '<p class="events-empty">No upcoming events at the moment. Please check back soon or contact us.</p>';
+        return;
+    }
+
+    events.forEach((event) => {
+        grid.appendChild(createEventCard(event));
+    });
+
+    grid.querySelectorAll('.event-card').forEach((card) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+
+        requestAnimationFrame(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
         });
     });
 }
@@ -664,139 +872,182 @@ function initializeKeyboardNavigation() {
 // ============================================
 // Sermon Filter & Search Hub (Option C)
 // ============================================
+let sermonFilterState = { activeFilter: 'all', searchTimeout: null };
+
+function applySermonFilters() {
+    const searchInput = document.getElementById('sermon-search');
+    const sermonsGrid = document.getElementById('sermons-grid');
+    if (!searchInput || !sermonsGrid) return;
+
+    const query = searchInput.value.toLowerCase().trim();
+    const sermonCards = sermonsGrid.querySelectorAll('.sermon-card');
+
+    sermonCards.forEach((card) => {
+        const title = (card.querySelector('h3')?.textContent || '').toLowerCase();
+        const speaker = (card.querySelector('.sermon-speaker')?.textContent || '').toLowerCase();
+        const description = (card.querySelector('.sermon-description')?.textContent || '').toLowerCase();
+
+        const matchesSearch = !query || title.includes(query) || speaker.includes(query) || description.includes(query);
+        const filterValue = sermonFilterState.activeFilter.toLowerCase();
+        const matchesTag = sermonFilterState.activeFilter === 'all' || speaker.includes(filterValue);
+
+        card.classList.toggle('hide', !(matchesSearch && matchesTag));
+    });
+
+    const visibleCards = [...sermonCards].filter((c) => !c.classList.contains('hide'));
+    let noResults = document.getElementById('sermon-no-results');
+
+    if (visibleCards.length === 0 && sermonCards.length > 0) {
+        if (!noResults) {
+            noResults = document.createElement('p');
+            noResults.id = 'sermon-no-results';
+            noResults.className = 'sermons-empty';
+            noResults.textContent = 'No sermons found. Try a different search or filter.';
+            sermonsGrid.appendChild(noResults);
+        }
+    } else if (noResults) {
+        noResults.remove();
+    }
+}
+
 function initializeSermonFilters() {
     const searchInput = document.getElementById('sermon-search');
-    const filterTags  = document.querySelectorAll('.filter-tag');
-    const sermonCards = document.querySelectorAll('.sermon-card');
-    const sermonsGrid = document.querySelector('.sermons-grid');
+    const filterContainer = document.querySelector('.sermon-filter-tags');
+    const sermonsGrid = document.getElementById('sermons-grid');
 
-    if (!searchInput || !filterTags.length || !sermonCards.length) return;
+    if (!searchInput || !sermonsGrid) return;
 
-    let activeFilter = 'all';
+    sermonsGrid.style.position = 'relative';
 
-    // Make the grid a positioning context for the .hide trick
-    if (sermonsGrid) sermonsGrid.style.position = 'relative';
-
-    function applyFilters() {
-        const query = searchInput.value.toLowerCase().trim();
-
-        sermonCards.forEach(card => {
-            const title       = (card.querySelector('h3')?.textContent || '').toLowerCase();
-            const speaker     = (card.querySelector('.sermon-speaker')?.textContent || '').toLowerCase();
-            const description = (card.querySelector('.sermon-description')?.textContent || '').toLowerCase();
-
-            const matchesSearch = !query || title.includes(query) || speaker.includes(query) || description.includes(query);
-            const matchesTag    = activeFilter === 'all' || speaker.includes(activeFilter.toLowerCase());
-
-            if (matchesSearch && matchesTag) {
-                card.classList.remove('hide');
-            } else {
-                card.classList.add('hide');
-            }
+    if (!searchInput.dataset.filterBound) {
+        searchInput.dataset.filterBound = 'true';
+        searchInput.addEventListener('input', () => {
+            clearTimeout(sermonFilterState.searchTimeout);
+            sermonFilterState.searchTimeout = setTimeout(applySermonFilters, 200);
         });
-
-        // Show "no results" message if every card is hidden
-        const visibleCards = [...sermonCards].filter(c => !c.classList.contains('hide'));
-        let noResults = document.getElementById('sermon-no-results');
-
-        if (visibleCards.length === 0) {
-            if (!noResults) {
-                noResults = document.createElement('p');
-                noResults.id = 'sermon-no-results';
-                noResults.style.cssText = `
-                    text-align: center;
-                    color: var(--medium-text);
-                    font-size: 1.1rem;
-                    padding: 40px;
-                    grid-column: 1 / -1;
-                `;
-                noResults.textContent = 'No sermons found. Try a different search or filter.';
-                sermonsGrid.appendChild(noResults);
-            }
-        } else if (noResults) {
-            noResults.remove();
-        }
     }
 
-    // Live search listener (debounced for performance)
-    let searchTimeout;
-    searchInput.addEventListener('input', () => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(applyFilters, 200);
-    });
+    if (filterContainer && !filterContainer.dataset.filterBound) {
+        filterContainer.dataset.filterBound = 'true';
+        filterContainer.addEventListener('click', (e) => {
+            const tag = e.target.closest('.filter-tag');
+            if (!tag) return;
 
-    // Speaker tag filter listeners
-    filterTags.forEach(tag => {
-        tag.addEventListener('click', () => {
-            filterTags.forEach(t => t.classList.remove('active'));
+            filterContainer.querySelectorAll('.filter-tag').forEach((t) => t.classList.remove('active'));
             tag.classList.add('active');
-            activeFilter = tag.getAttribute('data-filter');
-
-            // Clear the search input when a speaker tag is clicked
+            sermonFilterState.activeFilter = tag.getAttribute('data-filter') || 'all';
             searchInput.value = '';
-            applyFilters();
+            applySermonFilters();
         });
-    });
+    }
+}
+
+window.reinitializeSermonFilters = function () {
+    sermonFilterState.activeFilter = 'all';
+    applySermonFilters();
+};
+
+document.addEventListener('teleios:sermons-loaded', () => {
+    applySermonFilters();
+});
+
+function initializeGoogleCalendarEmbed() {
+    const config = window.TELEIOS_CONFIG || {};
+    const embedUrl = config.googleCalendarEmbedUrl;
+    const wrap = document.getElementById('google-calendar-embed');
+    if (!wrap || !embedUrl) return;
+
+    wrap.innerHTML = `
+        <iframe
+            src="${embedUrl}"
+            title="Teleios Church calendar"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+    `;
+    wrap.classList.remove('hidden');
 }
 
 // ============================================
-// Giving Portal — Copy to Clipboard (Option B)
+// Giving — Copy banking details to clipboard
 // ============================================
 function initializeGivingPortal() {
-    const copyBtn  = document.getElementById('btn-copy-acc');
-    const accNumEl = document.getElementById('acc-num-text');
+    const copyAccBtn  = document.getElementById('btn-copy-acc');
+    const copyAllBtn  = document.getElementById('btn-copy-all');
+    const accNumEl    = document.getElementById('acc-num-text');
+    const branchEl    = document.getElementById('branch-code-text');
 
-    if (!copyBtn || !accNumEl) return;
+    if (!accNumEl) return;
 
-    copyBtn.addEventListener('click', async () => {
-        const accNumber = accNumEl.textContent.trim();
+    const bankDetailsText = [
+        'Teleios Church — Giving (EFT)',
+        'Bank: Standard Bank',
+        'Account holder: Teleios Church SA',
+        `Account number: ${accNumEl.textContent.trim()}`,
+        `Branch code: ${branchEl ? branchEl.textContent.trim() : '051001'}`,
+        'Account type: Cheque / Current',
+        'Reference: Tithes / Offering'
+    ].join('\n');
 
+    async function copyText(text, successTitle, button) {
         try {
-            await navigator.clipboard.writeText(accNumber);
+            await navigator.clipboard.writeText(text);
 
-            // SweetAlert2 toast — premium gold-themed
             Swal.fire({
                 toast: true,
                 position: 'top-end',
                 icon: 'success',
-                title: `<span style="font-size:0.95rem;">Account number <strong>${accNumber}</strong> copied!</span>`,
+                title: successTitle,
                 showConfirmButton: false,
                 timer: 3500,
                 timerProgressBar: true,
                 background: '#0D1B2A',
                 color: '#FAF9F6',
-                iconColor: '#D4AF37',
-                customClass: {
-                    popup: 'swal-toast-custom'
-                }
+                iconColor: '#D4AF37'
             });
 
-            // Visual feedback on the button itself
-            const originalContent = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-            copyBtn.style.background = '#2ecc71';
-            copyBtn.style.color = 'white';
+            if (button) {
+                const originalContent = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                button.style.background = '#2ecc71';
+                button.style.color = 'white';
 
-            setTimeout(() => {
-                copyBtn.innerHTML = originalContent;
-                copyBtn.style.background = '';
-                copyBtn.style.color = '';
-            }, 2500);
-
+                setTimeout(() => {
+                    button.innerHTML = originalContent;
+                    button.style.background = '';
+                    button.style.color = '';
+                }, 2500);
+            }
         } catch (err) {
-            // Fallback for browsers that deny clipboard API
             Swal.fire({
                 toast: true,
                 position: 'top-end',
                 icon: 'warning',
                 title: 'Could not copy automatically.',
-                text: `Please copy manually: ${accNumber}`,
+                text: 'Please copy the details manually from the page.',
                 showConfirmButton: true,
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#D4AF37'
             });
         }
-    });
+    }
+
+    if (copyAccBtn) {
+        copyAccBtn.addEventListener('click', () => {
+            const accNumber = accNumEl.textContent.trim();
+            copyText(
+                accNumber,
+                `Account number ${accNumber} copied!`,
+                copyAccBtn
+            );
+        });
+    }
+
+    if (copyAllBtn) {
+        copyAllBtn.addEventListener('click', () => {
+            copyText(bankDetailsText, 'All banking details copied!', copyAllBtn);
+        });
+    }
 }
 
 

@@ -1193,6 +1193,7 @@ p {
 .sermon-content h3 {
     color: var(--deep-blue);
     margin-bottom: 10px;
+    font-size: 1.35rem;
 }
 
 .sermon-date,

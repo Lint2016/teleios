@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "teleios-7bf72",
     "public": "public",
     "ignore": [
       "firebase.json",

@@ -379,7 +379,7 @@ p {
 }
 
 .navbar.scrolled {
-    background: rgba(250, 249, 246, 0.90);
+    background: rgba(250, 249, 246, 0.92);
     border-bottom: 1px solid rgba(212, 175, 55, 0.25);
     box-shadow: var(--shadow-light);
 }
@@ -392,6 +392,7 @@ p {
     justify-content: space-between;
     align-items: center;
     height: 70px;
+    gap: 16px;
 }
 
 .nav-logo img {
@@ -414,6 +415,56 @@ p {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+/* ── Give Now CTA Pill Button in Navbar ── */
+.nav-give-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 20px;
+    background: linear-gradient(135deg, var(--church-yellow), #c8a030);
+    color: var(--deep-blue);
+    font-family: var(--font-secondary);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    border-radius: 999px;
+    border: none;
+    box-shadow: 0 4px 14px rgba(212, 175, 55, 0.30);
+    transition: var(--transition-smooth);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.nav-give-btn:hover {
+    background: linear-gradient(135deg, #e0bb42, var(--church-yellow));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(212, 175, 55, 0.40);
+    color: var(--deep-blue);
+}
+
+.nav-give-btn i {
+    font-size: 0.85rem;
+}
+
+/* Mobile nav backdrop overlay */
+.nav-backdrop {
+    display: none;
+    position: fixed;
+    inset: 70px 0 0 0;
+    background: rgba(13, 27, 42, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.nav-backdrop.active {
+    display: block;
+    opacity: 1;
 }
 
 .nav-menu {
@@ -558,9 +609,19 @@ p {
 /* Hero Section */
 /* Fade-in keyframes */
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(1.02); }
+  from { opacity: 0; transform: scale(1.06); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* Ken Burns — slow cinematic zoom + drift, loops after fade-in */
+@keyframes kenBurns {
+  0%   { transform: scale(1)    translate(0,    0);    }
+  25%  { transform: scale(1.06) translate(-1%, -1%);   }
+  50%  { transform: scale(1.09) translate( 1%, -0.5%); }
+  75%  { transform: scale(1.06) translate( 0.5%, 1%);  }
+  100% { transform: scale(1)    translate(0,    0);    }
+}
+
 .hero {
     height: 100vh;
     position: relative;
@@ -585,11 +646,12 @@ p {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit:cover;
+    object-fit: cover;
     object-position: top center;
     z-index: -1;
-    transform: translateZ(0);
-  animation: fadeIn 1.5s ease-out forwards;
+    transform-origin: center center;
+    /* fade-in first, then Ken Burns loop starts */
+    animation: fadeIn 1.5s ease-out forwards, kenBurns 24s ease-in-out 1.5s infinite;
 }
 
 .hero-overlay {
@@ -1254,8 +1316,42 @@ p {
 /* Community Section */
 .community {
     padding: var(--section-padding);
-    background: linear-gradient(135deg, var(--church-blue), var(--church-yellow));
+    /* Deep navy with radial gold glow — avoids the muddy green mid-blend */
+    background: linear-gradient(145deg, #0D1B2A 0%, #1B263B 55%, #162033 100%);
     color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle radial gold shimmer in top-right */
+.community::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -15%;
+    width: 650px;
+    height: 650px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.10) 0%, transparent 68%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Second glow bottom-left for depth */
+.community::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.community .container {
+    position: relative;
+    z-index: 1;
 }
 
 .community .section-title {
@@ -1263,11 +1359,11 @@ p {
 }
 
 .community .section-title::after {
-    background: white;
+    background: linear-gradient(90deg, var(--church-yellow), rgba(212, 175, 55, 0.3));
 }
 
 .community .section-subtitle {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.85);
 }
 
 .community-stats {
@@ -1932,10 +2028,313 @@ p {
     border-color: var(--church-yellow);
 }
 
+/* Leadership Section */
+.leaders {
+    padding: var(--section-padding);
+    background: var(--warm-white);
+}
+
+.leaders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.leader-card {
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+    display: flex;
+    flex-direction: row;
+    transition: var(--transition-smooth);
+    border: 1px solid rgba(212, 175, 55, 0.08);
+}
+
+.leader-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-heavy);
+    border-color: rgba(212, 175, 55, 0.25);
+}
+
+.leader-image-wrapper {
+    flex: 0 0 200px;
+    height: 100%;
+    min-height: 250px;
+    position: relative;
+    overflow: hidden;
+}
+
+.leader-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    transition: var(--transition-smooth);
+}
+
+.leader-card:hover .leader-image {
+    transform: scale(1.05);
+}
+
+.leader-info {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+.leader-role {
+    font-family: var(--font-secondary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--church-yellow);
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+}
+
+.leader-info h3 {
+    font-family: var(--font-primary);
+    color: var(--deep-blue);
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+}
+
+.leader-bio {
+    font-size: 0.95rem;
+    color: var(--medium-text);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.leader-socials {
+    display: flex;
+    gap: 15px;
+}
+
+.leader-socials a {
+    color: var(--medium-text);
+    font-size: 1.2rem;
+    transition: var(--transition-smooth);
+}
+
+.leader-socials a:hover {
+    color: var(--church-yellow);
+    transform: scale(1.15);
+}
+
+/* Responsive styles for Leadership */
+@media (max-width: 992px) {
+    .leaders-grid {
+        grid-template-columns: 1fr;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media (max-width: 576px) {
+    .leader-card {
+        flex-direction: column;
+    }
+    
+    .leader-image-wrapper {
+        flex: 0 0 280px;
+        height: 280px;
+    }
+    
+    .leader-info {
+        padding: 24px;
+    }
+}
+
+/* Google Calendar Embed */
+.google-calendar-embed {
+    margin-bottom: 40px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    background: white;
+}
+
+.google-calendar-embed iframe {
+    width: 100%;
+    height: 600px;
+    border: none;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .google-calendar-embed iframe {
+        height: 400px;
+    }
+}
+
+@media (max-width: 480px) {
+    .google-calendar-embed iframe {
+        height: 320px;
+    }
+}
+
+/* Newsletter Section */
+.newsletter {
+    padding: 60px 0;
+    background: var(--warm-white);
+}
+
+.newsletter-card {
+    background: linear-gradient(135deg, var(--deep-blue), var(--church-blue));
+    border-radius: var(--border-radius);
+    padding: 50px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.newsletter-content {
+    flex: 1;
+    max-width: 550px;
+}
+
+.newsletter-content h2 {
+    color: var(--light-yellow);
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+    font-family: var(--font-primary);
+}
+
+.newsletter-content p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.05rem;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.newsletter-form {
+    flex: 1;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.newsletter-inputs {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
+
+.newsletter-form-group {
+    flex: 1;
+}
+
+.newsletter-form-group input {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    font-family: var(--font-secondary);
+    font-size: 1rem;
+    transition: var(--transition-smooth);
+}
+
+.newsletter-form-group input:focus {
+    outline: none;
+    border-color: var(--church-yellow);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+}
+
+.newsletter-form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.newsletter-form .btn {
+    padding: 16px 32px;
+    font-size: 1rem;
+    white-space: nowrap;
+}
+
+.newsletter-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.newsletter-consent input[type="checkbox"] {
+    margin-top: 5px;
+    accent-color: var(--church-yellow);
+    cursor: pointer;
+}
+
+.newsletter-consent label {
+    font-family: var(--font-secondary);
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.newsletter-consent label a {
+    color: var(--church-yellow);
+    text-decoration: underline;
+}
+
+.newsletter-consent label a:hover {
+    color: #e0bb42;
+}
+
+/* Newsletter Responsive styles */
+@media (max-width: 992px) {
+    .newsletter-card {
+        flex-direction: column;
+        padding: 40px;
+        text-align: center;
+        gap: 30px;
+    }
+    
+    .newsletter-content {
+        max-width: 100%;
+    }
+    
+    .newsletter-form {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .newsletter-inputs {
+        flex-direction: column;
+    }
+    
+    .newsletter-form .btn {
+        width: 100%;
+    }
+    
+    .newsletter-consent {
+        text-align: left;
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     :root {
         --section-padding: 60px 0;
+    }
+
+    /* Hide Give Now in desktop layout; show inside mobile menu */
+    .nav-give-btn {
+        display: none;
     }
     
     .nav-menu {
@@ -1944,11 +2343,14 @@ p {
         top: 70px;
         flex-direction: column;
         background: var(--soft-cream);
-        width: 100%;
+        width: 80%;
+        max-width: 320px;
+        height: calc(100vh - 70px);
         text-align: center;
-        transition: 0.3s;
-        box-shadow: var(--shadow-medium);
-        padding: 20px 0;
+        transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: var(--shadow-heavy);
+        padding: 28px 0 40px;
+        overflow-y: auto;
     }
     
     .nav-menu.active {
@@ -1956,7 +2358,42 @@ p {
     }
     
     .nav-menu li {
-        margin: 10px 0;
+        margin: 6px 0;
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .nav-menu.active li {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Stagger each nav item */
+    .nav-menu.active li:nth-child(1) { transition-delay: 0.05s; }
+    .nav-menu.active li:nth-child(2) { transition-delay: 0.10s; }
+    .nav-menu.active li:nth-child(3) { transition-delay: 0.15s; }
+    .nav-menu.active li:nth-child(4) { transition-delay: 0.20s; }
+    .nav-menu.active li:nth-child(5) { transition-delay: 0.25s; }
+    .nav-menu.active li:nth-child(6) { transition-delay: 0.30s; }
+    .nav-menu.active li:nth-child(7) { transition-delay: 0.35s; }
+    .nav-menu.active li:nth-child(8) { transition-delay: 0.40s; }
+    .nav-menu.active li:nth-child(9) { transition-delay: 0.45s; }
+
+    /* Give Now pill inside the mobile drawer */
+    .nav-menu .nav-give-mobile {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 16px auto 0;
+        padding: 11px 28px;
+        background: linear-gradient(135deg, var(--church-yellow), #c8a030);
+        color: var(--deep-blue);
+        font-weight: 700;
+        font-size: 1rem;
+        border-radius: 999px;
+        text-decoration: none;
+        box-shadow: 0 4px 14px rgba(212, 175, 55, 0.30);
     }
     
     .nav-toggle {
@@ -2069,10 +2506,13 @@ p {
     h1 {
         font-size: 2.2rem;
     }
-    
+
+    /* Compact verse on very small screens */
     .hero-verse {
-        font-size: 1.1rem;
-        padding: 15px;
+        font-size: 1rem;
+        padding: 14px 16px;
+        border-left-width: 2px;
+        margin: 20px 0;
     }
     
     .btn {

@@ -96,6 +96,9 @@
                     <a href="#about" class="nav-link">About</a>
                 </li>
                 <li class="nav-item">
+                    <a href="#leaders" class="nav-link">Leadership</a>
+                </li>
+                <li class="nav-item">
                     <a href="#plan-visit" class="nav-link">Visit</a>
                 </li>
                 <li class="nav-item">
@@ -111,12 +114,17 @@
                     <a href="https://teleioscommunity.mn.co/" class="nav-link nav-link--external" target="_blank" rel="noopener noreferrer">Connect Online</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#giving" class="nav-link">Giving</a>
-                </li>
-                <li class="nav-item">
                     <a href="#contact" class="nav-link">Contact</a>
                 </li>
+                <!-- Give Now — visible inside mobile drawer only -->
+                <li class="nav-item" aria-hidden="true">
+                    <a href="#giving" class="nav-give-mobile"><i class="fas fa-hand-holding-heart"></i> Give Now</a>
+                </li>
             </ul>
+            <!-- Give Now pill — visible on desktop only -->
+            <a href="#giving" class="nav-give-btn" id="nav-give-btn" aria-label="Support our mission — Give Now">
+                <i class="fas fa-hand-holding-heart"></i> Give Now
+            </a>
             <div class="nav-toggle" id="mobile-menu" role="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-menu" tabindex="0">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -124,6 +132,8 @@
             </div>
         </div>
     </nav>
+    <!-- Mobile nav backdrop -->
+    <div class="nav-backdrop" id="nav-backdrop" aria-hidden="true"></div>
 
     <main id="main-content">
     <!-- Hero Section -->
@@ -196,6 +206,47 @@
                         <p>Church Community Gathering</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leadership Section -->
+    <section id="leaders" class="leaders">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Our Leadership</h2>
+                <p class="section-subtitle">Dedicated spiritual guides leading us to maturity</p>
+            </div>
+            <div class="leaders-grid">
+                <article class="leader-card">
+                    <div class="leader-image-wrapper">
+                        <img src="images/brandon_bailey.png" alt="Apostle Brandon Bailey" class="leader-image" loading="lazy">
+                    </div>
+                    <div class="leader-info">
+                        <span class="leader-role">Founder & Senior Pastor</span>
+                        <h3>Apostle Brandon Bailey</h3>
+                        <p class="leader-bio">Apostle Brandon is the Founder and Senior Leader of Teleios Church. He also serves as the Presiding Apostle of the Kingdom Impact Network (KIN). An international speaker and author of 'God the Ultimate Nation Builder', he is passionate about teaching apostolic truths and equipping believers to walk in spiritual maturity.</p>
+                        <div class="leader-socials">
+                            <a href="https://teleioscommunity.mn.co/" target="_blank" rel="noopener noreferrer" aria-label="Apostle Brandon on Teleios Community"><i class="fa-solid fa-church"></i></a>
+                            <a href="https://www.youtube.com/channel/UCIqka1KcckcYRK3DXynQbiw" target="_blank" rel="noopener noreferrer" aria-label="Apostle Brandon on YouTube"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="leader-card">
+                    <div class="leader-image-wrapper">
+                        <img src="images/marilyn_bailey.png" alt="Pastor Marilyn Bailey" class="leader-image" loading="lazy">
+                    </div>
+                    <div class="leader-info">
+                        <span class="leader-role">Co-Founder & Pastor</span>
+                        <h3>Pastor Marilyn Bailey</h3>
+                        <p class="leader-bio">Pastor Marilyn is the Co-Founder of Teleios Church, serving alongside her husband, Apostle Brandon. With a warm heart for pastoral care and family building, she leads various community and mentoring initiatives, fostering a culture of genuine fellowship, prayer, and kingdom values.</p>
+                        <div class="leader-socials">
+                            <a href="https://teleioscommunity.mn.co/" target="_blank" rel="noopener noreferrer" aria-label="Pastor Marilyn on Teleios Community"><i class="fa-solid fa-church"></i></a>
+                            <a href="https://www.youtube.com/channel/UCIqka1KcckcYRK3DXynQbiw" target="_blank" rel="noopener noreferrer" aria-label="Pastor Marilyn on YouTube"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+                </article>
             </div>
         </div>
     </section>
@@ -452,6 +503,30 @@
         </div>
     </section>
 
+    <!-- Newsletter Section -->
+    <section id="newsletter" class="newsletter animate-in">
+        <div class="container">
+            <div class="newsletter-card">
+                <div class="newsletter-content">
+                    <h2>Stay Connected</h2>
+                    <p>Subscribe to our newsletter to receive weekly sermon summaries, upcoming events, and spiritual encouragement directly in your inbox.</p>
+                </div>
+                <form id="newsletter-form" class="newsletter-form" action="https://formspree.io/f/xeozbzbn" method="POST">
+                    <div class="newsletter-inputs">
+                        <div class="newsletter-form-group">
+                            <input type="email" id="newsletter-email" name="email" placeholder="Enter your email address" required aria-label="Email Address">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="btn-subscribe">Subscribe</button>
+                    </div>
+                    <div class="newsletter-consent">
+                        <input type="checkbox" id="newsletter-consent" name="consent" required>
+                        <label for="newsletter-consent">I agree to receive communications from Teleios Church and accept the <a href="#privacy">Privacy Policy</a> (POPIA compliant).</label>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact Section -->
     <section id="contact" class="contact">
         <div class="container">
@@ -483,7 +558,7 @@
                         </div>
                         <div class="contact-item">
                             <i class="fas fa-envelope"></i>
-                            <span>info@teleioschurch.co.za</span>
+                            <a href="mailto:info@teleioschurch.co.za">info@teleioschurch.co.za</a>
                         </div>
                         <div class="contact-item">
                             <i class="fa-solid fa-church"></i>
@@ -596,7 +671,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <div class="nav-logo">
-                <img src="images/teleios.jpg" alt="teleios-church" loading="lazy">
+                <img src="images/teleios.jpg" alt="teleios-church" loading="lazy" width="50" height="50">
             </div>
                     <h3>Teleios Church</h3>
                     <p>"Therefore let us go unto maturity" - Hebrews 6:1</p>
@@ -609,6 +684,7 @@
                     <h4>Quick Links</h4>
                     <ul>
                         <li><a href="#about">About Us</a></li>
+                        <li><a href="#leaders">Leadership</a></li>
                         <li><a href="#plan-visit">Plan Your Visit</a></li>
                         <li><a href="#events">Events</a></li>
                         <li><a href="#sermons">Sermons</a></li>
@@ -635,7 +711,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 Teleios Church. All rights reserved. Built with love for our community.</p>
+                <p>&copy; 2026 Teleios Church. All rights reserved. Built with love for our community.</p>
             </div>
         </div>
     </footer>

@@ -40,8 +40,8 @@ Work through **one item at a time**. Mark status as you complete each phase.
 | 2.2 | **YouTube sermon thumbnails** on cards + link to channel | Sermons feel alive, not placeholder | `[x]` |
 | 2.3 | **Watch Online** CTA → YouTube channel / latest live (not only Mighty Network) | Clear online worship path | `[x]` |
 | 2.4 | Fix nav: **Community** (external) vs **Ministries** (`#ministries` section) | Remove duplicate `id` / confusion | `[x]` |
-| 2.5 | **Pastors / leaders** section with photos and short bios | Trust through faces | `[ ]` |
-| 2.6 | **Newsletter** signup (Mailchimp / Brevo embed) | Stay connected beyond Sunday | `[ ]` |
+| 2.5 | **Pastors / leaders** section with photos and short bios | Trust through faces | `[x]` |
+| 2.6 | **Newsletter** signup (Mailchimp / Brevo embed) | Stay connected beyond Sunday | `[x]` |
 
 ---
 
@@ -61,7 +61,7 @@ Work through **one item at a time**. Mark status as you complete each phase.
 
 | # | Task | Why | Status |
 |---|------|-----|--------|
-| 4.1 | **Google Calendar** embed or API for events | Auto-updating schedule | `[~]` set `googleCalendarEmbedUrl` in `site-config.js` |
+| 4.1 | **Google Calendar** embed or API for events | Auto-updating schedule | `[x]` |
 | 4.2 | **YouTube playlist** sync for sermon grid | No hand-editing each sermon | `[x]` RSS feed from channel |
 | 4.3 | Sermon **series** pages (title, dates, notes PDF) | Premium preaching archive | `[ ]` |
 
@@ -88,10 +88,10 @@ Work through **one item at a time**. Mark status as you complete each phase.
 6. ~~**2.2–2.4** YouTube + nav~~  
 7. ~~**Phase 3** SEO & POPIA (mostly complete)~~  
 8. ~~**4.2** YouTube sermon auto-load~~  
-9. **2.5** Pastors / leaders section *(next)*  
-10. **2.6** Newsletter signup  
-11. **4.1** Google Calendar embed URL in `site-config.js` (optional)  
-12. **1.3** PayFast — when merchant account exists
+9. ~~**2.5** Pastors / leaders section~~  
+10. ~~**2.6** Newsletter signup~~  
+11. ~~**4.1** Google Calendar embed URL in `site-config.js` (optional)~~  
+12. **1.3** PayFast — when merchant account exists *(next)*
 
 ---
 

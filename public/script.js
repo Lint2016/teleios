@@ -316,7 +316,9 @@ function initializeNavigation() {
                 } else if (entry.target.classList.contains('event-card') ||
                           entry.target.classList.contains('visit-card') ||
                           entry.target.classList.contains('sermon-card') ||
-                          entry.target.classList.contains('ministry-card')) {
+                          entry.target.classList.contains('ministry-card') ||
+                          entry.target.classList.contains('leader-card') ||
+                          entry.target.classList.contains('newsletter-card')) {
                     // Animate other cards with a slight delay
                     const delay = Array.from(entry.target.parentNode.children).indexOf(entry.target) * 150;
                     setTimeout(() => {
@@ -337,7 +339,7 @@ function initializeNavigation() {
     }, observerOptions);
     
     // Observe elements for animation
-    const animateElements = document.querySelectorAll('.value-item, .visit-card, .event-card, .sermon-card, .ministry-card, .stat-item');
+    const animateElements = document.querySelectorAll('.value-item, .visit-card, .event-card, .sermon-card, .ministry-card, .stat-item, .leader-card, .newsletter-card');
     animateElements.forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
@@ -381,17 +383,18 @@ function initializeNavigation() {
 // ============================================
 // Contact & Prayer Form Submission Handling with Formspree
 // ============================================
-const forms = document.querySelectorAll('.contact-form');
+const forms = document.querySelectorAll('.contact-form, .newsletter-form');
 
 forms.forEach(form => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const formData = new FormData(form);
+    const isNewsletter = form.classList.contains('newsletter-form');
 
     Swal.fire({
-      title: 'Sending...',
-      text: 'Please wait while we submit your message.',
+      title: isNewsletter ? 'Subscribing...' : 'Sending...',
+      text: isNewsletter ? 'Please wait while we add you to our list.' : 'Please wait while we submit your message.',
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
@@ -409,8 +412,8 @@ forms.forEach(form => {
       if (response.ok) {
         Swal.fire({
           icon: 'success',
-          title: 'Message Sent!',
-          text: 'Thank you, your submission has been received.',
+          title: isNewsletter ? 'Subscribed!' : 'Message Sent!',
+          text: isNewsletter ? 'Thank you for subscribing to our newsletter.' : 'Thank you, your submission has been received.',
           confirmButtonColor: '#3085d6'
         });
         form.reset();
@@ -418,7 +421,7 @@ forms.forEach(form => {
         Swal.fire({
           icon: 'error',
           title: 'Oops!',
-          text: 'Message not sent, please try again!',
+          text: isNewsletter ? 'Subscription failed, please try again!' : 'Message not sent, please try again!',
           confirmButtonColor: '#d33'
         });
       }
@@ -966,6 +969,7 @@ function initializeGoogleCalendarEmbed() {
         ></iframe>
     `;
     wrap.classList.remove('hidden');
+    wrap.removeAttribute('aria-hidden');
 }
 
 // ============================================

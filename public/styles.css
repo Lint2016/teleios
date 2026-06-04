@@ -1054,15 +1054,43 @@ p {
     font-size: 1rem;
 }
 
+.event-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-top: 10px;
+}
+
 .event-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--church-blue);
     color: var(--church-blue);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
     transition: var(--transition-smooth);
+    background: transparent;
+    cursor: pointer;
 }
 
 .event-link:hover {
     color: var(--deep-blue);
+    border-color: var(--deep-blue);
+    background: rgba(27, 38, 59, 0.05);
+}
+
+.event-link.event-save-btn {
+    background: var(--church-blue);
+    color: white;
+    border-color: transparent;
+}
+
+.event-link.event-save-btn:hover {
+    background: var(--deep-blue);
 }
 
 .event-recurring {

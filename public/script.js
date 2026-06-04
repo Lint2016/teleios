@@ -614,6 +614,62 @@ function buildGoogleCalendarUrl(event) {
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
+function formatIcsDate(date) {
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}T${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}${pad(date.getUTCSeconds())}Z`;
+}
+
+function escapeIcsText(value) {
+    if (!value) return '';
+    return String(value)
+        .replace(/\\/g, '\\\\')
+        .replace(/;/g, '\\;')
+        .replace(/,/g, '\\,')
+        .replace(/\r?\n/g, '\\n');
+}
+
+function createIcsPayload(event) {
+    const startDate = new Date(event.start);
+    const endDate = new Date(event.start);
+    endDate.setHours(endDate.getHours() + (event.durationHours || 2));
+
+    const uid = `teleios-${event.title.replace(/\W+/g, '-').toLowerCase()}-${startDate.getTime()}@teleioschurch.co.za`;
+    const dtstamp = formatIcsDate(new Date());
+    const dtstart = formatIcsDate(startDate);
+    const dtend = formatIcsDate(endDate);
+
+    return [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Teleios Church//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        `UID:${uid}`,
+        `DTSTAMP:${dtstamp}`,
+        `DTSTART:${dtstart}`,
+        `DTEND:${dtend}`,
+        `SUMMARY:${escapeIcsText(event.title)}`,
+        `DESCRIPTION:${escapeIcsText(event.description)}`,
+        `LOCATION:${escapeIcsText(CHURCH_LOCATION)}`,
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ].join('\r\n');
+}
+
+function downloadIcs(event) {
+    const icsContent = createIcsPayload(event);
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${event.title.replace(/\W+/g, '_').toLowerCase() || 'teleios-event'}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
 function buildUpcomingEventsList() {
     const now = new Date();
     const items = [];
@@ -677,9 +733,17 @@ function createEventCard(event) {
             ${recurringMarkup}
             <p class="event-time"><i class="fas fa-clock" aria-hidden="true"></i> ${event.timeLabel}</p>
             <p class="event-description">${event.description}</p>
-            <a href="${calendarUrl}" class="event-link" target="_blank" rel="noopener noreferrer">Add to Google Calendar</a>
+            <div class="event-actions">
+                <a href="${calendarUrl}" class="event-link" target="_blank" rel="noopener noreferrer">Google Calendar</a>
+                <button type="button" class="event-link event-save-btn" aria-label="Download this event to your calendar">Save to Calendar</button>
+            </div>
         </div>
     `;
+
+    const saveButton = card.querySelector('.event-save-btn');
+    if (saveButton) {
+        saveButton.addEventListener('click', () => downloadIcs(event));
+    }
 
     return card;
 }

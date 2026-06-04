@@ -722,6 +722,117 @@ p {
     animation: fadeInUp 1s ease-out 0.6s both;
 }
 
+.hero-countdown {
+    width: min(100%, 760px);
+    margin: 32px auto 0;
+    padding: 24px 24px 18px;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 20px 60px rgba(13, 27, 42, 0.18);
+}
+
+.countdown-label {
+    margin: 0;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.countdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.countdown-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(212, 175, 55, 0.18);
+    color: var(--church-blue);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    opacity: 0;
+    transform: scale(0.9);
+    transition: var(--transition-smooth);
+    pointer-events: none;
+}
+
+.countdown-badge.active {
+    opacity: 1;
+    transform: scale(1);
+    animation: pulseLiveBadge 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseLiveBadge {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.35);
+    }
+    50% {
+        box-shadow: 0 0 18px 6px rgba(212, 175, 55, 0.16);
+    }
+}
+
+.countdown-timer {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(72px, 1fr));
+    gap: 14px;
+}
+
+.countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 12px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.countdown-value {
+    font-size: clamp(1.75rem, 2.25vw, 2.4rem);
+    font-weight: 800;
+    color: var(--warm-yellow);
+    line-height: 1;
+}
+
+.countdown-unit {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.countdown-note {
+    margin: 14px auto 0;
+    max-width: 640px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.98rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .countdown-timer {
+        grid-template-columns: repeat(2, minmax(80px, 1fr));
+    }
+}
+
 .scroll-indicator {
     position: absolute;
     bottom: 30px;

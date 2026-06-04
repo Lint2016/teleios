@@ -193,6 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeGivingPortal();
     initializeCarousel();
     initializeUpcomingEvents();
+    initializeSundayCountdown();
     initializeGoogleCalendarEmbed();
 
     if (typeof initializeYouTubeSermons === 'function') {
@@ -774,6 +775,77 @@ function initializeUpcomingEvents() {
             card.style.transform = 'translateY(0)';
         });
     });
+}
+
+function getThisSundayServiceTimes(now) {
+    const serviceStart = new Date(now);
+    const offsetToSunday = now.getDay();
+    serviceStart.setDate(now.getDate() - offsetToSunday);
+    serviceStart.setHours(9, 0, 0, 0);
+
+    const serviceEnd = new Date(serviceStart);
+    serviceEnd.setHours(11, 30, 0, 0);
+
+    return { serviceStart, serviceEnd };
+}
+
+function initializeSundayCountdown() {
+    const stateLabel = document.getElementById('countdown-state');
+    const badge = document.getElementById('countdown-badge');
+    const daysEl = document.getElementById('countdown-days');
+    const hoursEl = document.getElementById('countdown-hours');
+    const minutesEl = document.getElementById('countdown-minutes');
+    const secondsEl = document.getElementById('countdown-seconds');
+
+    if (!stateLabel || !daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+
+    const getNextServiceStart = (reference) => {
+        const nextSunday = new Date(reference);
+        const offset = (7 - nextSunday.getDay()) % 7;
+        nextSunday.setDate(nextSunday.getDate() + offset);
+        nextSunday.setHours(9, 0, 0, 0);
+        if (nextSunday <= reference) {
+            nextSunday.setDate(nextSunday.getDate() + 7);
+        }
+        return nextSunday;
+    };
+
+    const updateCountdown = () => {
+        const now = new Date();
+        const { serviceStart, serviceEnd } = getThisSundayServiceTimes(now);
+        let countdownTarget = serviceStart;
+        let statusText = 'Countdown to Sunday Service';
+
+        let isLive = false;
+
+        if (now >= serviceStart && now < serviceEnd) {
+            countdownTarget = serviceEnd;
+            statusText = 'Service is live — ends in';
+            isLive = true;
+        } else if (now >= serviceEnd) {
+            countdownTarget = getNextServiceStart(now);
+            statusText = 'Countdown to next Sunday Service';
+        }
+
+        const diff = countdownTarget - now;
+        const totalSeconds = Math.max(0, Math.floor(diff / 1000));
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        stateLabel.textContent = statusText;
+        if (badge) {
+            badge.classList.toggle('active', isLive);
+        }
+        daysEl.textContent = String(days).padStart(2, '0');
+        hoursEl.textContent = String(hours).padStart(2, '0');
+        minutesEl.textContent = String(minutes).padStart(2, '0');
+        secondsEl.textContent = String(seconds).padStart(2, '0');
+    };
+
+    updateCountdown();
+    window.setInterval(updateCountdown, 1000);
 }
     
 // ============================================

@@ -787,12 +787,17 @@ p {
 }
 
 .countdown-timer {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(72px, 1fr));
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
     gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
 }
 
 .countdown-item {
+    min-width: 90px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -829,7 +834,7 @@ p {
 
 @media (max-width: 768px) {
     .countdown-timer {
-        grid-template-columns: repeat(2, minmax(80px, 1fr));
+        justify-content: flex-start;
     }
 }
 

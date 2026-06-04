@@ -131,7 +131,23 @@
     <section id="home" class="hero">
         <div class="hero-video-container">
             <div class="hero-overlay"></div>
-            <img src="images/teleiosLeaders.png" alt="Church Leaders" class="hero-image" width="1920" height="1080" fetchpriority="high" decoding="async">
+            <!-- Responsive hero image: provide AVIF/WebP fallbacks and srcset for different widths.
+                 Generate optimized variants (e.g. teleiosLeaders-768.webp, -1200.webp, -1920.webp)
+                 and place them in the images/ folder for best performance. -->
+            <picture>
+                <source type="image/avif" srcset="images/teleiosLeaders-768.avif 768w, images/teleiosLeaders-1200.avif 1200w, images/teleiosLeaders-1920.avif 1920w" sizes="(max-width: 768px) 100vw, 1200px">
+                <source type="image/webp" srcset="images/teleiosLeaders-768.webp 768w, images/teleiosLeaders-1200.webp 1200w, images/teleiosLeaders-1920.webp 1920w" sizes="(max-width: 768px) 100vw, 1200px">
+                <img src="images/teleiosLeaders.png"
+                     srcset="images/teleiosLeaders-768.png 768w, images/teleiosLeaders-1200.png 1200w, images/teleiosLeaders-1920.png 1920w"
+                     sizes="(max-width: 768px) 100vw, 1200px"
+                     alt="Church Leaders"
+                     class="hero-image"
+                     width="1920"
+                     height="1080"
+                     fetchpriority="high"
+                     decoding="async"
+                     loading="eager">
+            </picture>
         </div>
         <div class="hero-content">
             <div class="hero-text">

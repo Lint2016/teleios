@@ -43,6 +43,10 @@
                     <button type="submit" class="btn btn-primary" id="login-btn">Sign In</button>
                 </form>
                 <div id="login-message" class="admin-message" role="status" aria-live="polite"></div>
+                <details id="admin-debug-panel" class="admin-debug-panel" open>
+                    <summary>Debug log (share this if sign-in fails)</summary>
+                    <pre id="admin-debug-log" aria-live="polite">Waiting for admin.js…</pre>
+                </details>
                 <p class="admin-note">This page is not linked from the main site. Create the admin user once in Firebase Console → Authentication.</p>
             </div>
 

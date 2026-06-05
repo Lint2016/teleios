@@ -2,6 +2,33 @@ import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebas
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db, EVENTS_DOC_REF, EVENTS_JSON_URL } from './firebase-shared.js';
 
+const DEBUG = true;
+const debugLogEl = document.getElementById('admin-debug-log');
+
+function adminLog(message, detail) {
+    const time = new Date().toLocaleTimeString('en-ZA');
+    const line = detail !== undefined
+        ? `[${time}] ${message} ${typeof detail === 'string' ? detail : JSON.stringify(detail, null, 2)}`
+        : `[${time}] ${message}`;
+
+    if (DEBUG) console.log('[Teleios Admin]', message, detail !== undefined ? detail : '');
+
+    if (debugLogEl) {
+        debugLogEl.textContent = debugLogEl.textContent === 'Waiting for admin.js…'
+            ? line
+            : `${debugLogEl.textContent}\n${line}`;
+        debugLogEl.scrollTop = debugLogEl.scrollHeight;
+    }
+}
+
+function maskEmail(email) {
+    if (!email || !email.includes('@')) return '(empty)';
+    const [user, domain] = email.split('@');
+    return `${user.slice(0, 2)}***@${domain}`;
+}
+
+adminLog('admin.js module loaded');
+
 const adminLogin = document.getElementById('admin-login');
 const loginForm = document.getElementById('login-form');
 const adminEmail = document.getElementById('admin-email');
@@ -19,9 +46,22 @@ const btnImport = document.getElementById('btn-import');
 const btnDownload = document.getElementById('btn-download');
 const logoutBtn = document.getElementById('logout-btn');
 
+adminLog('DOM elements', {
+    loginForm: !!loginForm,
+    adminEmail: !!adminEmail,
+    adminPassword: !!adminPassword,
+    loginBtn: !!loginBtn,
+    loginMessage: !!loginMessage,
+    adminEditor: !!adminEditor
+});
+
+adminLog('Firebase project', auth.app?.options?.projectId || 'unknown');
+adminLog('Firestore path', `${EVENTS_DOC_REF.collection}/${EVENTS_DOC_REF.id}`);
+
 const eventsDocRef = doc(db, EVENTS_DOC_REF.collection, EVENTS_DOC_REF.id);
 
 function showLogin() {
+    adminLog('UI: showing login screen');
     adminLogin.classList.remove('hidden');
     adminEditor.classList.add('hidden');
     adminEditor.setAttribute('aria-hidden', 'true');
@@ -30,6 +70,7 @@ function showLogin() {
 }
 
 function showEditor() {
+    adminLog('UI: showing event editor');
     adminLogin.classList.add('hidden');
     adminEditor.classList.remove('hidden');
     adminEditor.setAttribute('aria-hidden', 'false');
@@ -40,7 +81,11 @@ function showEditor() {
 
 function showMessage(text, type = 'info', target = 'editor') {
     const el = target === 'login' ? loginMessage : adminMessage;
-    if (!el) return;
+    adminLog(`Message (${target}/${type})`, text || '(cleared)');
+    if (!el) {
+        adminLog('WARNING: message element missing', { target, type, text });
+        return;
+    }
     el.textContent = text;
     el.className = `admin-message admin-message-${type}`;
 }
@@ -73,11 +118,17 @@ function validateJson() {
 }
 
 async function loadEventsFromCloud() {
+    adminLog('Loading events from Firestore…');
     try {
         const snapshot = await getDoc(eventsDocRef);
 
         if (snapshot.exists()) {
             const data = snapshot.data();
+            adminLog('Firestore document found', {
+                recurringCount: (data.recurringEvents || []).length,
+                specialCount: (data.specialEvents || []).length,
+                hasUpdatedAt: !!data.updatedAt
+            });
             eventJsonTextarea.value = JSON.stringify({
                 recurringEvents: data.recurringEvents || [],
                 specialEvents: data.specialEvents || []
@@ -87,13 +138,16 @@ async function loadEventsFromCloud() {
             return;
         }
 
+        adminLog('No Firestore document yet — importing events.json');
         await importFromJsonFile(true);
     } catch (error) {
+        adminLog('Firestore load FAILED', { code: error.code, message: error.message });
         showMessage(`Could not load cloud events: ${error.message}`, 'error');
     }
 }
 
 async function importFromJsonFile(isAutoSeed = false) {
+    adminLog('Importing from events.json…');
     try {
         const response = await fetch(EVENTS_JSON_URL, { cache: 'no-store' });
         if (!response.ok) {
@@ -103,6 +157,10 @@ async function importFromJsonFile(isAutoSeed = false) {
         const data = await response.json();
         eventJsonTextarea.value = JSON.stringify(data, null, 2);
         setLastUpdated(null);
+        adminLog('events.json imported', {
+            recurringCount: (data.recurringEvents || []).length,
+            specialCount: (data.specialEvents || []).length
+        });
 
         if (isAutoSeed) {
             showMessage('No cloud events yet. Loaded events.json — edit and click Save to Cloud to publish.', 'info');
@@ -110,6 +168,7 @@ async function importFromJsonFile(isAutoSeed = false) {
             showMessage('Imported events.json into the editor. Click Save to Cloud to publish.', 'success');
         }
     } catch (error) {
+        adminLog('events.json import FAILED', { message: error.message });
         showMessage(`Import failed: ${error.message}`, 'error');
     }
 }
@@ -120,6 +179,7 @@ async function saveToCloud() {
 
     btnSave.disabled = true;
     btnSave.textContent = 'Saving…';
+    adminLog('Saving to Firestore…');
 
     try {
         await setDoc(eventsDocRef, {
@@ -130,8 +190,10 @@ async function saveToCloud() {
 
         const snapshot = await getDoc(eventsDocRef);
         setLastUpdated(snapshot.data()?.updatedAt);
+        adminLog('Save SUCCESS');
         showMessage('Events published! The live site will show your changes on the next page load.', 'success');
     } catch (error) {
+        adminLog('Save FAILED', { code: error.code, message: error.message });
         showMessage(`Save failed: ${error.message}`, 'error');
     } finally {
         btnSave.disabled = false;
@@ -156,12 +218,32 @@ function downloadJsonFile() {
 }
 
 if (!loginForm) {
+    adminLog('ERROR: login form not found — admin.js may not be wired to the page');
     console.error('Admin login form not found — admin.js may have loaded before the DOM.');
 } else {
+    adminLog('Login form listener attached');
+
     loginForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const email = adminEmail.value.trim();
         const password = adminPassword.value;
+
+        adminLog('Sign In clicked', {
+            email: maskEmail(email),
+            passwordLength: password.length
+        });
+
+        if (!email) {
+            showMessage('Enter your admin email.', 'error', 'login');
+            adminLog('Blocked: empty email');
+            return;
+        }
+
+        if (!password) {
+            showMessage('Enter your password.', 'error', 'login');
+            adminLog('Blocked: empty password');
+            return;
+        }
 
         if (loginBtn) {
             loginBtn.disabled = true;
@@ -170,15 +252,43 @@ if (!loginForm) {
         showMessage('Signing in…', 'info', 'login');
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            adminLog('Calling signInWithEmailAndPassword…');
+            const credential = await signInWithEmailAndPassword(auth, email, password);
+            adminLog('signInWithEmailAndPassword SUCCESS', {
+                uid: credential.user.uid,
+                email: maskEmail(credential.user.email)
+            });
             showMessage('', 'info', 'login');
         } catch (error) {
+            adminLog('signInWithEmailAndPassword FAILED', {
+                code: error.code,
+                message: error.message
+            });
             console.error('Admin sign-in failed:', error);
-            const hint = error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password'
-                ? 'Incorrect email or password.'
-                : error.code === 'auth/too-many-requests'
-                    ? 'Too many attempts. Wait a moment and try again.'
-                    : `Sign in failed (${error.code || 'unknown error'}).`;
+
+            let hint;
+            switch (error.code) {
+                case 'auth/invalid-credential':
+                case 'auth/wrong-password':
+                case 'auth/user-not-found':
+                    hint = 'Incorrect email or password. Check Firebase Console → Authentication → Users.';
+                    break;
+                case 'auth/invalid-email':
+                    hint = 'Invalid email format.';
+                    break;
+                case 'auth/too-many-requests':
+                    hint = 'Too many attempts. Wait a moment and try again.';
+                    break;
+                case 'auth/network-request-failed':
+                    hint = 'Network error. Check your internet connection.';
+                    break;
+                case 'auth/operation-not-allowed':
+                    hint = 'Email/Password sign-in is not enabled. Enable it in Firebase Console → Authentication.';
+                    break;
+                default:
+                    hint = `Sign in failed (${error.code || 'unknown'}): ${error.message}`;
+            }
+
             showMessage(hint, 'error', 'login');
         } finally {
             if (loginBtn) {
@@ -189,19 +299,35 @@ if (!loginForm) {
     });
 }
 
-btnSave.addEventListener('click', saveToCloud);
-btnValidate.addEventListener('click', validateJson);
-btnReload.addEventListener('click', loadEventsFromCloud);
-btnImport.addEventListener('click', () => importFromJsonFile(false));
-btnDownload.addEventListener('click', downloadJsonFile);
-logoutBtn.addEventListener('click', async () => {
-    await signOut(auth);
-});
+if (btnSave) btnSave.addEventListener('click', saveToCloud);
+if (btnValidate) btnValidate.addEventListener('click', validateJson);
+if (btnReload) btnReload.addEventListener('click', loadEventsFromCloud);
+if (btnImport) btnImport.addEventListener('click', () => importFromJsonFile(false));
+if (btnDownload) btnDownload.addEventListener('click', downloadJsonFile);
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+        adminLog('Sign out clicked');
+        await signOut(auth);
+    });
+}
+
+adminLog('Setting up onAuthStateChanged listener…');
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
+        adminLog('Auth state: SIGNED IN', {
+            uid: user.uid,
+            email: maskEmail(user.email)
+        });
         showEditor();
         return;
     }
+
+    adminLog('Auth state: SIGNED OUT');
     showLogin();
+}, (error) => {
+    adminLog('onAuthStateChanged ERROR', { code: error.code, message: error.message });
+    showMessage(`Auth error: ${error.message}`, 'error', 'login');
 });
+
+adminLog('Admin init complete — try signing in');

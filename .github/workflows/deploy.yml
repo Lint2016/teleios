@@ -1,4 +1,4 @@
-name: Deploy to Firebase Hosting
+name: Deploy to Firebase
 
 on:
   push:
@@ -6,23 +6,16 @@ on:
       - master
 
 jobs:
-  build_and_deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Firebase credentials
+      - name: Setup Firebase service account
         run: |
           echo '${{ secrets.TELEIOS_SITE }}' > "${{ runner.temp }}/firebase-key.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=${{ runner.temp }}/firebase-key.json" >> $GITHUB_ENV
+          echo "Deploying as: $(node -e "console.log(require('${{ runner.temp }}/firebase-key.json').client_email)")"
 
-      - name: Deploy Firestore rules
-        run: npx firebase-tools@latest deploy --only firestore:rules --project teleios-7bf72 --non-interactive
-
-      - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.TELEIOS_SITE }}'
-          channelId: live
-          projectId: teleios-7bf72
+      - name: Deploy to Firebase (Hosting + Firestore rules)
+        run: npx firebase-tools@latest deploy --only hosting,firestore:rules --project teleios-7bf72 --non-interactive

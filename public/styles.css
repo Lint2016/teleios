@@ -1240,6 +1240,8 @@ p {
     transition: var(--transition-smooth);
     background: transparent;
     cursor: pointer;
+    font-size: 0.95rem;
+    gap: 6px;
 }
 
 .event-link:hover {
@@ -1258,6 +1260,62 @@ p {
     background: var(--deep-blue);
 }
 
+.event-link.event-whatsapp-btn {
+    border-color: #25D366;
+    color: #25D366;
+}
+
+.event-link.event-whatsapp-btn:hover {
+    background: rgba(37, 211, 102, 0.08);
+    color: #128C7E;
+    border-color: #128C7E;
+}
+
+.event-category {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 6px;
+}
+
+.event-card-icon {
+    font-size: 2rem;
+    opacity: 0.8;
+    color: var(--church-blue);
+    flex-shrink: 0;
+}
+
+.event-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.event-header h3 {
+    margin: 0;
+    line-height: 1.3;
+}
+
+.event-location {
+    font-size: 0.95rem;
+    color: var(--medium-text);
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.event-location i {
+    color: var(--church-blue);
+    flex-shrink: 0;
+}
+
 .event-recurring {
     font-size: 0.85rem;
     font-weight: 600;
@@ -1274,6 +1332,83 @@ p {
     color: var(--medium-text);
     font-size: 1.05rem;
     padding: 24px;
+}
+
+/* Mobile responsive for events */
+@media (max-width: 768px) {
+    .events-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .event-card {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .event-date {
+        width: 70px;
+        height: 70px;
+        padding: 12px;
+        font-size: 0.95rem;
+    }
+
+    .event-date .day {
+        font-size: 1.6rem;
+    }
+
+    .event-actions {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .event-link {
+        flex: 1;
+        min-width: 100px;
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .event-card-icon {
+        font-size: 1.6rem;
+    }
+
+    .event-description {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .events-grid {
+        gap: 16px;
+    }
+
+    .event-date {
+        width: 65px;
+        height: 65px;
+        padding: 10px;
+    }
+
+    .event-date .day {
+        font-size: 1.4rem;
+    }
+
+    .event-link {
+        padding: 9px 10px;
+        font-size: 0.8rem;
+    }
+
+    .event-link i {
+        font-size: 0.9rem;
+    }
+
+    .event-card-icon {
+        font-size: 1.4rem;
+    }
+
+    .event-header {
+        gap: 8px;
+    }
 }
 
 .contact-item a {

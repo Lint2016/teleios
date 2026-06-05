@@ -534,7 +534,11 @@ const RECURRING_EVENTS = [
         durationHours: 2,
         timeLabel: '09:00 AM',
         recurringLabel: 'Every Sunday',
-        description: 'Join us for inspiring worship, community prayer, and biblical teaching.'
+        description: 'Join us for inspiring worship, community prayer, and biblical teaching.',
+        category: 'Worship',
+        categoryColor: '#0066CC',
+        icon: 'fas fa-music',
+        location: '42 Antrim Road, Meredale South'
     },
     {
         id: 'wednesday-bible-study',
@@ -545,7 +549,11 @@ const RECURRING_EVENTS = [
         durationHours: 2,
         timeLabel: '7:00 PM',
         recurringLabel: 'Every Wednesday',
-        description: 'Deep dive into scripture with interactive discussion and fellowship.'
+        description: 'Deep dive into scripture with interactive discussion and fellowship.',
+        category: 'Teaching',
+        categoryColor: '#7C3AED',
+        icon: 'fas fa-book-open',
+        location: '42 Antrim Road, Meredale South'
     }
 ];
 
@@ -558,7 +566,11 @@ const SPECIAL_EVENTS = [
         minute: 0,
         durationHours: 2,
         timeLabel: '6:00 PM',
-        description: 'Reflect on the sacrifice of Christ in a solemn, hope-filled gathering.'
+        description: 'Reflect on the sacrifice of Christ in a solemn, hope-filled gathering.',
+        category: 'Worship',
+        categoryColor: '#DC2626',
+        icon: 'fas fa-cross',
+        location: '42 Antrim Road, Meredale South'
     },
     {
         title: 'Easter Sunday Celebration',
@@ -567,7 +579,76 @@ const SPECIAL_EVENTS = [
         minute: 0,
         durationHours: 2,
         timeLabel: '09:00 AM',
-        description: 'Celebrate the resurrection with worship, teaching, and joyful fellowship.'
+        description: 'Celebrate the resurrection with worship, teaching, and joyful fellowship.',
+        category: 'Celebration',
+        categoryColor: '#059669',
+        icon: 'fas fa-dove',
+        location: '42 Antrim Road, Meredale South'
+    },
+    {
+        title: 'Prayer & Intercession Night',
+        date: '2026-06-15',
+        hour: 19,
+        minute: 0,
+        durationHours: 2,
+        timeLabel: '7:00 PM',
+        description: 'Join us for a night of corporate prayer, intercession, and worship.',
+        category: 'Prayer',
+        categoryColor: '#7C3AED',
+        icon: 'fas fa-hands-praying',
+        location: '42 Antrim Road, Meredale South'
+    },
+    {
+        title: 'Youth Outreach Event',
+        date: '2026-07-12',
+        hour: 14,
+        minute: 0,
+        durationHours: 3,
+        timeLabel: '2:00 PM',
+        description: 'Community service and fellowship for young adults. Bring a friend!',
+        category: 'Youth',
+        categoryColor: '#F59E0B',
+        icon: 'fas fa-users',
+        location: 'Meredale Community Center'
+    },
+    {
+        title: 'Baptism & Commissioning Service',
+        date: '2026-08-09',
+        hour: 10,
+        minute: 0,
+        durationHours: 2,
+        timeLabel: '10:00 AM',
+        description: 'Witness water baptisms and the commissioning of new ministry leaders.',
+        category: 'Milestone',
+        categoryColor: '#0891B2',
+        icon: 'fas fa-water',
+        location: '42 Antrim Road, Meredale South'
+    },
+    {
+        title: 'Family Fellowship Picnic',
+        date: '2026-09-26',
+        hour: 11,
+        minute: 0,
+        durationHours: 3,
+        timeLabel: '11:00 AM',
+        description: 'Bring your family for games, food, and fellowship in a relaxed outdoor setting.',
+        category: 'Fellowship',
+        categoryColor: '#EC4899',
+        icon: 'fas fa-tree',
+        location: 'Meredale Park'
+    },
+    {
+        title: 'Thanksgiving Service',
+        date: '2026-11-22',
+        hour: 10,
+        minute: 0,
+        durationHours: 2,
+        timeLabel: '10:00 AM',
+        description: 'Gather to give thanks for God\'s faithfulness and blessings over the year.',
+        category: 'Celebration',
+        categoryColor: '#D97706',
+        icon: 'fas fa-heart',
+        location: '42 Antrim Road, Meredale South'
     },
     {
         title: 'Christmas Eve Service',
@@ -576,7 +657,11 @@ const SPECIAL_EVENTS = [
         minute: 0,
         durationHours: 2,
         timeLabel: '6:00 PM',
-        description: 'Celebrate the birth of Christ with carols, candlelight, and communion.'
+        description: 'Celebrate the birth of Christ with carols, candlelight, and communion.',
+        category: 'Celebration',
+        categoryColor: '#DC2626',
+        icon: 'fas fa-snowflake',
+        location: '42 Antrim Road, Meredale South'
     }
 ];
 
@@ -710,7 +795,7 @@ function buildUpcomingEventsList() {
         unique.push(item);
     });
 
-    return unique.slice(0, 3);
+    return unique.slice(0, 8);
 }
 
 function createEventCard(event) {
@@ -723,6 +808,21 @@ function createEventCard(event) {
     const recurringMarkup = event.isRecurring
         ? `<p class="event-recurring">${event.recurringLabel}</p>`
         : '';
+    
+    const categoryMarkup = event.category
+        ? `<span class="event-category" style="background-color: ${event.categoryColor}">${event.category}</span>`
+        : '';
+    
+    const iconMarkup = event.icon
+        ? `<i class="${event.icon} event-card-icon"></i>`
+        : '';
+    
+    const locationMarkup = event.location
+        ? `<p class="event-location"><i class="fas fa-map-marker-alt"></i> ${event.location}</p>`
+        : '';
+    
+    const whatsappText = encodeURIComponent(`Hi Teleios Church, I'm interested in the ${event.title} on ${month} ${day}. See you there!`);
+    const whatsappUrl = `https://wa.me/27671630558?text=${whatsappText}`;
 
     card.innerHTML = `
         <div class="event-date">
@@ -730,13 +830,27 @@ function createEventCard(event) {
             <span class="day">${day}</span>
         </div>
         <div class="event-content">
-            <h3>${event.title}</h3>
+            <div class="event-header">
+                ${iconMarkup}
+                <div>
+                    <h3>${event.title}</h3>
+                    ${categoryMarkup}
+                </div>
+            </div>
             ${recurringMarkup}
-            <p class="event-time"><i class="fas fa-clock" aria-hidden="true"></i> ${event.timeLabel}</p>
+            <p class="event-time"><i class="fas fa-clock"></i> ${event.timeLabel}</p>
+            ${locationMarkup}
             <p class="event-description">${event.description}</p>
             <div class="event-actions">
-                <a href="${calendarUrl}" class="event-link" target="_blank" rel="noopener noreferrer">Google Calendar</a>
-                <button type="button" class="event-link event-save-btn" aria-label="Download this event to your calendar">Save to Calendar</button>
+                <a href="${calendarUrl}" class="event-link" target="_blank" rel="noopener noreferrer" title="Add to Google Calendar">
+                    <i class="fas fa-calendar-plus"></i> Add
+                </a>
+                <button type="button" class="event-link event-save-btn" title="Download event file">
+                    <i class="fas fa-download"></i> Save
+                </button>
+                <a href="${whatsappUrl}" class="event-link event-whatsapp-btn" target="_blank" rel="noopener noreferrer" title="Share on WhatsApp">
+                    <i class="fab fa-whatsapp"></i> Share
+                </a>
             </div>
         </div>
     `;

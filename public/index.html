@@ -104,13 +104,13 @@
                 <li class="nav-item">
                     <a href="https://teleioscommunity.mn.co/" class="nav-link nav-link--external" target="_blank" rel="noopener noreferrer">Connect Online</a>
                 </li>
-                <li class="nav-item">
+                                <li class="nav-item">
                     <a href="#contact" class="nav-link">Contact</a>
                 </li>
                 <!-- Give Now — visible inside mobile drawer only -->
-                <!-- <li class="nav-item" aria-hidden="true">
+                <li class="nav-item" aria-hidden="true">
                     <a href="#giving" class="nav-give-mobile"><i class="fas fa-hand-holding-heart"></i> Give Now</a>
-                </li> -->
+                </li>
             </ul>
             <!-- Give Now pill — visible on desktop only -->
             <a href="#giving" class="nav-give-btn" id="nav-give-btn" aria-label="Support our mission — Give Now">
@@ -465,7 +465,7 @@
                 <h2 class="section-title">Support Our Mission</h2>
                 <p class="section-subtitle">"Every man according as he purposed in his heart, so let him give... for God loves a cheerful giver." - 2 Corinthians 9:7</p>
             </div>
-            <div class="giving-content">
+                            <div class="giving-content">
                 <div class="giving-how-to-card">
                     <div class="portal-icon"><i class="fas fa-university"></i></div>
                     <h3>Give via EFT</h3>
@@ -476,12 +476,13 @@
                         <li>Use reference <strong>Tithes</strong>, <strong>Offering</strong>, or your name so we can acknowledge your gift.</li>
                         <li>Confirm the payment — thank you for supporting the ministry.</li>
                     </ol>
-                    <p class="giving-note">Online card giving (PayFast) may be added later. For questions or international giving, contact us on WhatsApp.</p>
+                    <p class="giving-note">Online card and international giving available through PayPal (right). For questions, contact us on WhatsApp.</p>
                     <a href="https://wa.me/27671630558?text=Hello%20Teleios%20Church%2C%20I%20have%20a%20question%20about%20giving." class="btn btn-secondary giving-whatsapp-btn" target="_blank" rel="noopener noreferrer">
                         <i class="fab fa-whatsapp"></i> Ask about giving
                     </a>
                 </div>
 
+                <div class="giving-cards-stack">
                 <div class="bank-details-card">
                     <div class="bank-badge">EFT Bank Transfer</div>
                     <h3>Banking Details</h3>
@@ -521,6 +522,59 @@
                             <i class="fas fa-clipboard-list"></i> Copy all details
                         </button>
                     </div>
+                </div>
+
+                <div class="paypal-donation-card">
+                    <div class="paypal-badge">Global Payment</div>
+                    <h3>Give via PayPal</h3>
+                    <p>Support our ministry globally with secure PayPal payments. Perfect for international giving.</p>
+                    
+                    <div class="paypal-features">
+                        <div class="paypal-feature">
+                            <i class="fas fa-globe"></i>
+                            <span>International</span>
+                        </div>
+                        <div class="paypal-feature">
+                            <i class="fas fa-lock"></i>
+                            <span>Secure</span>
+                        </div>
+                        <div class="paypal-feature">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Card Friendly</span>
+                        </div>
+                    </div>
+
+                    <div class="paypal-donation-buttons">
+                        <div class="paypal-button-wrapper">
+                            <button type="button" class="btn paypal-btn paypal-btn--primary" data-amount="50" aria-label="Donate R50 via PayPal">
+                                <i class="fab fa-paypal"></i> Donate R50
+                            </button>
+                        </div>
+                        <div class="paypal-button-wrapper">
+                            <button type="button" class="btn paypal-btn paypal-btn--primary" data-amount="100" aria-label="Donate R100 via PayPal">
+                                <i class="fab fa-paypal"></i> Donate R100
+                            </button>
+                        </div>
+                        <div class="paypal-button-wrapper">
+                            <button type="button" class="btn paypal-btn paypal-btn--primary" data-amount="250" aria-label="Donate R250 via PayPal">
+                                <i class="fab fa-paypal"></i> Donate R250
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="paypal-custom-section">
+                        <p class="paypal-custom-label">Or enter custom amount:</p>
+                        <div class="paypal-custom-input-wrapper">
+                            <span class="currency-symbol">R</span>
+                            <input type="number" id="paypal-custom-amount" class="paypal-custom-input" placeholder="0.00" min="10" step="0.01" aria-label="Custom donation amount">
+                        </div>
+                        <button type="button" class="btn paypal-btn paypal-btn--secondary" id="paypal-custom-btn" aria-label="Donate custom amount via PayPal">
+                            <i class="fab fa-paypal"></i> Donate Now
+                        </button>
+                    </div>
+                    
+                    <p class="paypal-note">Donations are secure and processed through PayPal. You'll receive a receipt via email.</p>
+                </div>
                 </div>
             </div>
         </div>

@@ -773,8 +773,15 @@ function createEventCard(event) {
            </a>`
         : '';
 
-    const rsvpText = encodeURIComponent(`Hi Teleios Church, I would like to RSVP for ${event.title} at ${event.timeLabel}.`);
-    const rsvpUrl = `https://wa.me/27671630558?text=${rsvpText}`;
+    const rsvpMarkup = event.isRecurring
+        ? ''
+        : (() => {
+            const rsvpText = encodeURIComponent(`Hi Teleios Church, I would like to RSVP for ${event.title} at ${event.timeLabel}.`);
+            const rsvpUrl = `https://wa.me/27671630558?text=${rsvpText}`;
+            return `<a href="${rsvpUrl}" class="event-link event-rsvp-btn" target="_blank" rel="noopener noreferrer" title="RSVP via WhatsApp">
+                <i class="fas fa-check-circle"></i> RSVP
+            </a>`;
+        })();
 
     card.innerHTML = `
         ${dateMarkup}
@@ -798,9 +805,7 @@ function createEventCard(event) {
                 <button type="button" class="event-link event-save-btn" title="Download event file">
                     <i class="fas fa-download"></i> Save
                 </button>
-                <a href="${rsvpUrl}" class="event-link event-rsvp-btn" target="_blank" rel="noopener noreferrer" title="RSVP via WhatsApp">
-                    <i class="fas fa-check-circle"></i> RSVP
-                </a>
+                ${rsvpMarkup}
             </div>
         </div>
     `;
@@ -1088,12 +1093,8 @@ function applySermonFilters() {
 
     sermonCards.forEach((card) => {
         const title = (card.querySelector('h3')?.textContent || '').toLowerCase();
-        const speaker = (card.querySelector('.sermon-speaker')?.textContent || '').toLowerCase();
-        const description = (card.querySelector('.sermon-description')?.textContent || '').toLowerCase();
-
-        const matchesSearch = !query || title.includes(query) || speaker.includes(query) || description.includes(query);
-        const filterValue = sermonFilterState.activeFilter.toLowerCase();
-        const matchesTag = sermonFilterState.activeFilter === 'all' || speaker.includes(filterValue);
+        const matchesSearch = !query || title.includes(query);
+        const matchesTag = sermonFilterState.activeFilter === 'all';
 
         card.classList.toggle('hide', !(matchesSearch && matchesTag));
     });
@@ -1106,7 +1107,7 @@ function applySermonFilters() {
             noResults = document.createElement('p');
             noResults.id = 'sermon-no-results';
             noResults.className = 'sermons-empty';
-            noResults.textContent = 'No sermons found. Try a different search or filter.';
+            noResults.textContent = 'No sermons found. Try a different title.';
             sermonsGrid.appendChild(noResults);
         }
     } else if (noResults) {

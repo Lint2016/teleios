@@ -184,7 +184,6 @@
             <div class="sermon-content">
                 <h3>${escapeHtml(sermon.title)}</h3>
                 ${dateStr ? `<p class="sermon-date">${escapeHtml(dateStr)}</p>` : ''}
-                <p class="sermon-speaker">${escapeHtml(sermon.speaker)}</p>
                 <p class="sermon-description">${escapeHtml(sermon.description)}</p>
                 <div class="sermon-actions">
                     <button type="button" class="btn btn-video"><i class="fas fa-video" aria-hidden="true"></i> Watch</button>
@@ -203,21 +202,11 @@
         return card;
     }
 
-    function buildSpeakerFilters(sermons) {
+    function buildSpeakerFilters() {
         const container = document.querySelector('.sermon-filter-tags');
         if (!container) return;
 
-        const speakers = [...new Set(sermons.map((s) => s.speaker).filter(Boolean))].slice(0, 6);
-
         container.innerHTML = '<button type="button" class="filter-tag active" data-filter="all">All Sermons</button>';
-        speakers.forEach((speaker) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'filter-tag';
-            btn.setAttribute('data-filter', speaker);
-            btn.textContent = speaker;
-            container.appendChild(btn);
-        });
     }
 
     function observeSermonCards(grid) {
@@ -258,7 +247,7 @@
             grid.appendChild(createSermonCard(sermon));
         });
 
-        buildSpeakerFilters(sermons);
+        buildSpeakerFilters();
         observeSermonCards(grid);
 
         if (typeof window.reinitializeSermonFilters === 'function') {

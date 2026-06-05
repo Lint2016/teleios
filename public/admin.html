@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teleios Church Admin</title>
+    <meta name="description" content="Admin editor for Teleios Church event data.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="images/teleios.jpg" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="admin-page">
+    <main class="admin-container">
+        <section class="admin-panel" aria-label="Admin event editor">
+            <div class="admin-branding">
+                <div class="nav-logo">
+                    <img src="images/teleios.jpg" alt="Teleios Church" width="56" height="56">
+                </div>
+                <div>
+                    <h1>Teleios Event Admin</h1>
+                    <p class="admin-subtitle">Edit the event JSON source used by the public upcoming events section.</p>
+                </div>
+            </div>
+
+            <div id="admin-login" class="admin-login">
+                <p>Enter the admin password to unlock the event editor.</p>
+                <form id="login-form" class="admin-form">
+                    <label for="admin-password">Admin password</label>
+                    <input id="admin-password" type="password" autocomplete="current-password" required>
+                    <button type="submit" class="btn btn-primary">Unlock Admin</button>
+                </form>
+                <p class="admin-note">This page is intentionally not linked from the main site. Keep the URL private.</p>
+            </div>
+
+            <div id="admin-editor" class="admin-editor hidden" aria-hidden="true">
+                <div class="admin-header">
+                    <h2>Event JSON Editor</h2>
+                    <button id="logout-btn" class="btn btn-secondary">Log Out</button>
+                </div>
+                <p class="admin-note">Edit the event file, then download the updated JSON and replace <code>events.json</code> in your deployment.</p>
+                <div class="admin-actions">
+                    <button id="btn-validate" type="button" class="btn btn-primary">Validate JSON</button>
+                    <button id="btn-copy" type="button" class="btn btn-secondary">Copy JSON</button>
+                    <button id="btn-download" type="button" class="btn btn-primary">Download JSON</button>
+                    <button id="btn-reload" type="button" class="btn btn-secondary">Reload from file</button>
+                </div>
+                <textarea id="event-json" class="admin-json-editor" aria-label="Edit event JSON"></textarea>
+                <div id="admin-message" class="admin-message"></div>
+            </div>
+        </section>
+    </main>
+    <script src="admin.js" defer></script>
+</body>
+</html>

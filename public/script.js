@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCarousel();
     initializeUpcomingEvents();
     initializeSundayCountdown();
-    initializeGoogleCalendarEmbed();
+    initializeEventsCalendarToggle();
 
     if (typeof initializeYouTubeSermons === 'function') {
         initializeYouTubeSermons();
@@ -522,7 +522,29 @@ function showNotification(message, type = 'info') {
 // Upcoming Events (recurring + special)
 // ============================================
 
+const EVENTS_JSON_URL = 'events.json';
 const CHURCH_LOCATION = 'Teleios Church, 42 Antrim Road, Meredale South, Johannesburg';
+
+async function loadEventData() {
+    try {
+        const response = await fetch(EVENTS_JSON_URL, { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error('Failed to fetch event data');
+        }
+
+        const data = await response.json();
+        return {
+            recurringEvents: Array.isArray(data.recurringEvents) ? data.recurringEvents : RECURRING_EVENTS,
+            specialEvents: Array.isArray(data.specialEvents) ? data.specialEvents : SPECIAL_EVENTS
+        };
+    } catch (error) {
+        console.warn('Could not load events.json, falling back to hard-coded event data.', error);
+        return {
+            recurringEvents: RECURRING_EVENTS,
+            specialEvents: SPECIAL_EVENTS
+        };
+    }
+}
 
 const RECURRING_EVENTS = [
     {
@@ -756,11 +778,13 @@ function downloadIcs(event) {
     URL.revokeObjectURL(url);
 }
 
-function buildUpcomingEventsList() {
+function buildUpcomingEventsList(eventData = {}) {
+    const recurringEvents = Array.isArray(eventData.recurringEvents) ? eventData.recurringEvents : RECURRING_EVENTS;
+    const specialEvents = Array.isArray(eventData.specialEvents) ? eventData.specialEvents : SPECIAL_EVENTS;
     const now = new Date();
     const items = [];
 
-    RECURRING_EVENTS.forEach((recurring) => {
+    recurringEvents.forEach((recurring) => {
         items.push({
             ...recurring,
             start: getNextOccurrence(recurring.dayOfWeek, recurring.hour, recurring.minute),
@@ -768,7 +792,7 @@ function buildUpcomingEventsList() {
         });
     });
 
-    SPECIAL_EVENTS.forEach((special) => {
+    specialEvents.forEach((special) => {
         const [year, month, day] = special.date.split('-').map(Number);
         const start = new Date(year, month - 1, day, special.hour, special.minute, 0, 0);
         if (start > now) {
@@ -821,8 +845,8 @@ function createEventCard(event) {
         ? `<p class="event-location"><i class="fas fa-map-marker-alt"></i> ${event.location}</p>`
         : '';
     
-    const whatsappText = encodeURIComponent(`Hi Teleios Church, I'm interested in the ${event.title} on ${month} ${day}. See you there!`);
-    const whatsappUrl = `https://wa.me/27671630558?text=${whatsappText}`;
+    const rsvpText = encodeURIComponent(`Hi Teleios Church, I would like to RSVP for ${event.title} on ${month} ${day} at ${event.timeLabel}.`);
+    const rsvpUrl = `https://wa.me/27671630558?text=${rsvpText}`;
 
     card.innerHTML = `
         <div class="event-date">
@@ -848,8 +872,8 @@ function createEventCard(event) {
                 <button type="button" class="event-link event-save-btn" title="Download event file">
                     <i class="fas fa-download"></i> Save
                 </button>
-                <a href="${whatsappUrl}" class="event-link event-whatsapp-btn" target="_blank" rel="noopener noreferrer" title="Share on WhatsApp">
-                    <i class="fab fa-whatsapp"></i> Share
+                <a href="${rsvpUrl}" class="event-link event-rsvp-btn" target="_blank" rel="noopener noreferrer" title="RSVP via WhatsApp">
+                    <i class="fas fa-check-circle"></i> RSVP
                 </a>
             </div>
         </div>
@@ -863,11 +887,12 @@ function createEventCard(event) {
     return card;
 }
 
-function initializeUpcomingEvents() {
+async function initializeUpcomingEvents() {
     const grid = document.getElementById('events-grid');
     if (!grid) return;
 
-    const events = buildUpcomingEventsList();
+    const eventData = await loadEventData();
+    const events = buildUpcomingEventsList(eventData);
     grid.innerHTML = '';
 
     if (events.length === 0) {
@@ -1218,8 +1243,43 @@ function initializeGoogleCalendarEmbed() {
             referrerpolicy="no-referrer-when-downgrade"
         ></iframe>
     `;
-    wrap.classList.remove('hidden');
-    wrap.removeAttribute('aria-hidden');
+    wrap.dataset.loaded = 'true';
+}
+
+function initializeEventsCalendarToggle() {
+    const toggleBtn = document.getElementById('events-calendar-toggle');
+    const calendarWrap = document.getElementById('google-calendar-embed');
+    const config = window.TELEIOS_CONFIG || {};
+    const embedUrl = config.googleCalendarEmbedUrl;
+
+    if (!toggleBtn || !calendarWrap || !embedUrl) {
+        if (toggleBtn) toggleBtn.style.display = 'none';
+        return;
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        const isOpen = !calendarWrap.classList.contains('hidden');
+
+        if (isOpen) {
+            calendarWrap.classList.add('hidden');
+            calendarWrap.setAttribute('aria-hidden', 'true');
+            toggleBtn.textContent = 'View Full Calendar';
+            toggleBtn.classList.remove('btn-primary');
+            toggleBtn.classList.add('btn-secondary');
+            return;
+        }
+
+        if (!calendarWrap.dataset.loaded) {
+            initializeGoogleCalendarEmbed();
+        }
+
+        calendarWrap.classList.remove('hidden');
+        calendarWrap.removeAttribute('aria-hidden');
+        toggleBtn.textContent = 'Hide Full Calendar';
+        toggleBtn.classList.remove('btn-secondary');
+        toggleBtn.classList.add('btn-primary');
+        calendarWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 }
 
 // ============================================

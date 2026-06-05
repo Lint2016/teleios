@@ -1278,6 +1278,31 @@ p {
     color: #b91c1c;
 }
 
+.admin-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 24px;
+    background: var(--deep-blue);
+    color: var(--cream);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-medium);
+}
+
+.admin-toolbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+
+.admin-toolbar-brand img {
+    border-radius: 50%;
+}
+
 .admin-logout-btn {
     display: inline-flex;
     align-items: center;
@@ -1615,6 +1640,30 @@ p {
 .event-location i {
     color: var(--church-blue);
     flex-shrink: 0;
+}
+
+.event-date--recurring {
+    background: linear-gradient(135deg, var(--deep-blue), #1b3a57);
+}
+
+.event-date--recurring .month {
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.event-online-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    color: var(--primary-blue);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.event-online-link:hover {
+    color: var(--gold);
 }
 
 .event-recurring {

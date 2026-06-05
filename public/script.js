@@ -574,7 +574,8 @@ const RECURRING_EVENTS = [
         category: 'Worship',
         categoryColor: '#0066CC',
         icon: 'fas fa-music',
-        location: '42 Antrim Road, Meredale South'
+        location: '42 Antrim Road, Meredale South',
+        isOnline: false
     },
     {
         id: 'wednesday-bible-study',
@@ -585,11 +586,13 @@ const RECURRING_EVENTS = [
         durationHours: 2,
         timeLabel: '7:00 PM',
         recurringLabel: 'Every Wednesday',
-        description: 'Deep dive into scripture with interactive discussion and fellowship.',
+        description: 'Join us online for Bible study, discussion, and fellowship.',
         category: 'Teaching',
         categoryColor: '#7C3AED',
-        icon: 'fas fa-book-open',
-        location: '42 Antrim Road, Meredale South'
+        icon: 'fas fa-video',
+        location: 'Online',
+        isOnline: true,
+        onlineUrl: 'https://www.youtube.com/channel/UCIqka1KcckcYRK3DXynQbiw'
     }
 ];
 
@@ -706,10 +709,7 @@ function buildUpcomingEventsList(eventData = {}) {
         const start = new Date(year, month - 1, day, special.hour, special.minute, 0, 0);
         if (start > now) {
             items.push({
-                title: special.title,
-                description: special.description,
-                timeLabel: special.timeLabel,
-                durationHours: special.durationHours,
+                ...special,
                 start,
                 isRecurring: false
             });
@@ -735,33 +735,49 @@ function createEventCard(event) {
     const card = document.createElement('article');
     card.className = 'event-card';
 
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const month = event.start.toLocaleString('en-ZA', { month: 'short' });
     const day = event.start.getDate();
     const calendarUrl = buildGoogleCalendarUrl(event);
     const recurringMarkup = event.isRecurring
         ? `<p class="event-recurring">${event.recurringLabel}</p>`
         : '';
-    
+
+    const dateMarkup = event.isRecurring
+        ? `<div class="event-date event-date--recurring">
+            <span class="month">Weekly</span>
+            <span class="day">${dayNames[event.dayOfWeek] ?? '—'}</span>
+           </div>`
+        : `<div class="event-date">
+            <span class="month">${month}</span>
+            <span class="day">${day}</span>
+           </div>`;
+
     const categoryMarkup = event.category
         ? `<span class="event-category" style="background-color: ${event.categoryColor}">${event.category}</span>`
         : '';
-    
+
     const iconMarkup = event.icon
         ? `<i class="${event.icon} event-card-icon"></i>`
         : '';
-    
+
+    const isOnline = event.isOnline || event.location === 'Online';
+    const locationIcon = isOnline ? 'fas fa-video' : 'fas fa-map-marker-alt';
     const locationMarkup = event.location
-        ? `<p class="event-location"><i class="fas fa-map-marker-alt"></i> ${event.location}</p>`
+        ? `<p class="event-location"><i class="${locationIcon}"></i> ${event.location}</p>`
         : '';
-    
-    const rsvpText = encodeURIComponent(`Hi Teleios Church, I would like to RSVP for ${event.title} on ${month} ${day} at ${event.timeLabel}.`);
+
+    const onlineMarkup = isOnline && event.onlineUrl
+        ? `<a href="${event.onlineUrl}" class="event-online-link" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-play-circle"></i> Join online
+           </a>`
+        : '';
+
+    const rsvpText = encodeURIComponent(`Hi Teleios Church, I would like to RSVP for ${event.title} at ${event.timeLabel}.`);
     const rsvpUrl = `https://wa.me/27671630558?text=${rsvpText}`;
 
     card.innerHTML = `
-        <div class="event-date">
-            <span class="month">${month}</span>
-            <span class="day">${day}</span>
-        </div>
+        ${dateMarkup}
         <div class="event-content">
             <div class="event-header">
                 ${iconMarkup}
@@ -773,6 +789,7 @@ function createEventCard(event) {
             ${recurringMarkup}
             <p class="event-time"><i class="fas fa-clock"></i> ${event.timeLabel}</p>
             ${locationMarkup}
+            ${onlineMarkup}
             <p class="event-description">${event.description}</p>
             <div class="event-actions">
                 <a href="${calendarUrl}" class="event-link" target="_blank" rel="noopener noreferrer" title="Add to Google Calendar">

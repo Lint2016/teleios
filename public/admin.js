@@ -27,7 +27,8 @@ const DEFAULT_RECURRING = [
         category: 'Worship',
         categoryColor: '#0066CC',
         icon: 'fas fa-music',
-        location: '42 Antrim Road, Meredale South'
+        location: '42 Antrim Road, Meredale South',
+        isOnline: false
     },
     {
         id: 'wednesday-bible-study',
@@ -38,11 +39,13 @@ const DEFAULT_RECURRING = [
         durationHours: 2,
         timeLabel: '7:00 PM',
         recurringLabel: 'Every Wednesday',
-        description: 'Deep dive into scripture with interactive discussion and fellowship.',
+        description: 'Join us online for Bible study, discussion, and fellowship.',
         category: 'Teaching',
         categoryColor: '#7C3AED',
-        icon: 'fas fa-book-open',
-        location: '42 Antrim Road, Meredale South'
+        icon: 'fas fa-video',
+        location: 'Online',
+        isOnline: true,
+        onlineUrl: 'https://www.youtube.com/channel/UCIqka1KcckcYRK3DXynQbiw'
     }
 ];
 
@@ -61,7 +64,9 @@ const loginMessage = document.getElementById('login-message');
 const loginBtn = document.getElementById('login-btn');
 const adminLastUpdated = document.getElementById('admin-last-updated');
 const adminMessage = document.getElementById('admin-message');
+const adminToolbar = document.getElementById('admin-toolbar');
 const logoutBtn = document.getElementById('logout-btn');
+const logoutBtnToolbar = document.getElementById('logout-btn-toolbar');
 const recurringList = document.getElementById('recurring-events-list');
 const specialList = document.getElementById('special-events-list');
 const eventForm = document.getElementById('event-form');
@@ -96,6 +101,7 @@ function showLogin() {
     adminEditor.classList.add('hidden');
     adminEditor.setAttribute('aria-hidden', 'true');
     adminLogin.setAttribute('aria-hidden', 'false');
+    if (adminToolbar) adminToolbar.classList.add('hidden');
 }
 
 function showEditor() {
@@ -104,6 +110,7 @@ function showEditor() {
     adminEditor.setAttribute('aria-hidden', 'false');
     adminLogin.setAttribute('aria-hidden', 'true');
     adminPassword.value = '';
+    if (adminToolbar) adminToolbar.classList.remove('hidden');
     loadEventsFromCloud();
 }
 
@@ -206,16 +213,21 @@ function renderRecurringEvents() {
         return;
     }
 
-    recurringList.innerHTML = recurringEvents.map((event) => `
+    recurringList.innerHTML = recurringEvents.map((event) => {
+        const locationIcon = event.isOnline ? 'fas fa-video' : 'fas fa-map-marker-alt';
+        const onlineNote = event.isOnline ? '<p class="admin-event-meta"><i class="fas fa-play-circle"></i> Online service</p>' : '';
+        return `
         <article class="admin-event-card admin-event-card--recurring">
             <div class="admin-event-card-main">
                 <h4>${event.title}</h4>
                 <p class="admin-event-meta"><i class="fas fa-redo"></i> ${event.recurringLabel}</p>
                 <p class="admin-event-meta"><i class="fas fa-clock"></i> ${event.timeLabel}</p>
-                <p class="admin-event-meta"><i class="fas fa-map-marker-alt"></i> ${event.location}</p>
+                <p class="admin-event-meta"><i class="${locationIcon}"></i> ${event.location}</p>
+                ${onlineNote}
             </div>
         </article>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function renderSpecialEvents() {
@@ -271,6 +283,8 @@ function renderSpecialEvents() {
 }
 
 async function saveEventsToCloud(successTitle, successText) {
+    recurringEvents = [...DEFAULT_RECURRING];
+
     await setDoc(eventsDocRef, {
         recurringEvents,
         specialEvents,
@@ -293,9 +307,7 @@ async function loadEventsFromCloud() {
 
         if (snapshot.exists()) {
             const data = snapshot.data();
-            recurringEvents = Array.isArray(data.recurringEvents) && data.recurringEvents.length
-                ? data.recurringEvents
-                : DEFAULT_RECURRING;
+            recurringEvents = [...DEFAULT_RECURRING];
             specialEvents = Array.isArray(data.specialEvents) ? data.specialEvents : [];
             setLastUpdated(data.updatedAt);
         } else {
@@ -425,12 +437,13 @@ if (loginForm) {
 
 if (eventForm) eventForm.addEventListener('submit', handleEventFormSubmit);
 if (eventFormCancel) eventFormCancel.addEventListener('click', resetEventForm);
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-        await signOut(auth);
-        resetEventForm();
-    });
+async function handleLogout() {
+    await signOut(auth);
+    resetEventForm();
 }
+
+if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+if (logoutBtnToolbar) logoutBtnToolbar.addEventListener('click', handleLogout);
 
 onAuthStateChanged(auth, (user) => {
     if (user) {

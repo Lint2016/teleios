@@ -592,7 +592,7 @@ const RECURRING_EVENTS = [
         icon: 'fas fa-video',
         location: 'Online',
         isOnline: true,
-        onlineUrl: 'href="https://teleioscommunity.mn.co/"'
+        onlineUrl: "https://teleioscommunity.mn.co/"
     }
 ];
 

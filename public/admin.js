@@ -9,6 +9,8 @@ const adminPassword = document.getElementById('admin-password');
 const adminEditor = document.getElementById('admin-editor');
 const eventJsonTextarea = document.getElementById('event-json');
 const adminMessage = document.getElementById('admin-message');
+const loginMessage = document.getElementById('login-message');
+const loginBtn = document.getElementById('login-btn');
 const adminLastUpdated = document.getElementById('admin-last-updated');
 const btnSave = document.getElementById('btn-save');
 const btnValidate = document.getElementById('btn-validate');
@@ -24,7 +26,7 @@ function showLogin() {
     adminEditor.classList.add('hidden');
     adminEditor.setAttribute('aria-hidden', 'true');
     adminLogin.setAttribute('aria-hidden', 'false');
-    adminMessage.textContent = '';
+    if (adminMessage) adminMessage.textContent = '';
 }
 
 function showEditor() {
@@ -36,9 +38,11 @@ function showEditor() {
     loadEventsFromCloud();
 }
 
-function showMessage(text, type = 'info') {
-    adminMessage.textContent = text;
-    adminMessage.className = `admin-message admin-message-${type}`;
+function showMessage(text, type = 'info', target = 'editor') {
+    const el = target === 'login' ? loginMessage : adminMessage;
+    if (!el) return;
+    el.textContent = text;
+    el.className = `admin-message admin-message-${type}`;
 }
 
 function formatUpdatedAt(timestamp) {
@@ -151,17 +155,39 @@ function downloadJsonFile() {
     showMessage('Backup download started.', 'success');
 }
 
-loginForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const email = adminEmail.value.trim();
-    const password = adminPassword.value;
+if (!loginForm) {
+    console.error('Admin login form not found — admin.js may have loaded before the DOM.');
+} else {
+    loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const email = adminEmail.value.trim();
+        const password = adminPassword.value;
 
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-        showMessage('Sign in failed. Check your email and password.', 'error');
-    }
-});
+        if (loginBtn) {
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in…';
+        }
+        showMessage('Signing in…', 'info', 'login');
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            showMessage('', 'info', 'login');
+        } catch (error) {
+            console.error('Admin sign-in failed:', error);
+            const hint = error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password'
+                ? 'Incorrect email or password.'
+                : error.code === 'auth/too-many-requests'
+                    ? 'Too many attempts. Wait a moment and try again.'
+                    : `Sign in failed (${error.code || 'unknown error'}).`;
+            showMessage(hint, 'error', 'login');
+        } finally {
+            if (loginBtn) {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        }
+    });
+}
 
 btnSave.addEventListener('click', saveToCloud);
 btnValidate.addEventListener('click', validateJson);

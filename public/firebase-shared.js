@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-import { getAnalytics } from 'firebase/analytics';
 
 const firebaseConfig = {
     apiKey: 'AIzaSyC7jRa33S56JYbvKXfphVKgTpFOs8aE21A',
@@ -16,10 +15,6 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
-
-if (typeof window !== 'undefined') {
-    getAnalytics(app);
-}
 
 export const EVENTS_DOC_REF = { collection: 'siteConfig', id: 'events' };
 export const EVENTS_JSON_URL = 'events.json';

@@ -40,8 +40,9 @@
                     <input id="admin-email" type="email" autocomplete="username" required>
                     <label for="admin-password">Password</label>
                     <input id="admin-password" type="password" autocomplete="current-password" required>
-                    <button type="submit" class="btn btn-primary">Sign In</button>
+                    <button type="submit" class="btn btn-primary" id="login-btn">Sign In</button>
                 </form>
+                <div id="login-message" class="admin-message" role="status" aria-live="polite"></div>
                 <p class="admin-note">This page is not linked from the main site. Create the admin user once in Firebase Console → Authentication.</p>
             </div>
 

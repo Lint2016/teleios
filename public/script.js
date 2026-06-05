@@ -1194,7 +1194,6 @@ function initializeGivingPortal() {
 //==== PayPal Donation Buttons ====
 //================================
 function initializePayPalButtons() {
-    const paypalBtns = document.querySelectorAll('.paypal-btn--primary[data-amount]');
     const customAmountInput = document.getElementById('paypal-custom-amount');
     const customBtn = document.getElementById('paypal-custom-btn');
 
@@ -1217,32 +1216,6 @@ function initializePayPalButtons() {
         });
         return `${baseUrl}?${params.toString()}`;
     }
-
-    // Handle preset amount buttons
-    paypalBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const amount = btn.getAttribute('data-amount');
-            const currency = 'ZAR';
-            const url = generatePayPalLink(amount, `Teleios Church - ${currency}${amount}`);
-            
-            // Show confirmation
-            Swal.fire({
-                title: 'Redirect to PayPal',
-                html: `You will be redirected to PayPal to donate <strong>${currency} ${amount}</strong>.<br/>Thank you for your generosity!`,
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonText: 'Continue to PayPal',
-                cancelButtonText: 'Cancel',
-                confirmButtonColor: '#0066CC',
-                cancelButtonColor: '#6c757d'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = url;
-                }
-            });
-        });
-    });
 
     // Handle custom amount button
     if (customBtn && customAmountInput) {

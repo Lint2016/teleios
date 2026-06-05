@@ -5,10 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teleios Church Admin</title>
     <meta name="description" content="Admin editor for Teleios Church event data.">
+    <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="styles.css">
     <link rel="shortcut icon" href="images/teleios.jpg" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script type="importmap">
+      {
+        "imports": {
+          "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+          "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js",
+          "firebase/auth": "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"
+        }
+      }
+    </script>
 </head>
 <body class="admin-page">
     <main class="admin-container">
@@ -19,37 +29,43 @@
                 </div>
                 <div>
                     <h1>Teleios Event Admin</h1>
-                    <p class="admin-subtitle">Edit the event JSON source used by the public upcoming events section.</p>
+                    <p class="admin-subtitle">Edit events and publish directly to the live site — no manual deploy needed.</p>
                 </div>
             </div>
 
             <div id="admin-login" class="admin-login">
-                <p>Enter the admin password to unlock the event editor.</p>
+                <p>Sign in with your Firebase admin account to edit events.</p>
                 <form id="login-form" class="admin-form">
-                    <label for="admin-password">Admin password</label>
+                    <label for="admin-email">Admin email</label>
+                    <input id="admin-email" type="email" autocomplete="username" required>
+                    <label for="admin-password">Password</label>
                     <input id="admin-password" type="password" autocomplete="current-password" required>
-                    <button type="submit" class="btn btn-primary">Unlock Admin</button>
+                    <button type="submit" class="btn btn-primary">Sign In</button>
                 </form>
-                <p class="admin-note">This page is intentionally not linked from the main site. Keep the URL private.</p>
+                <p class="admin-note">This page is not linked from the main site. Create the admin user once in Firebase Console → Authentication.</p>
             </div>
 
             <div id="admin-editor" class="admin-editor hidden" aria-hidden="true">
                 <div class="admin-header">
-                    <h2>Event JSON Editor</h2>
-                    <button id="logout-btn" class="btn btn-secondary">Log Out</button>
+                    <div>
+                        <h2>Event Editor</h2>
+                        <p id="admin-last-updated" class="admin-note"></p>
+                    </div>
+                    <button id="logout-btn" class="btn btn-secondary">Sign Out</button>
                 </div>
-                <p class="admin-note">Edit the event file, then download the updated JSON and replace <code>events.json</code> in your deployment.</p>
+                <p class="admin-note">Changes are saved to Firebase and appear on the public site within seconds. Use <strong>Save to Cloud</strong> when you are ready to publish.</p>
                 <div class="admin-actions">
-                    <button id="btn-validate" type="button" class="btn btn-primary">Validate JSON</button>
-                    <button id="btn-copy" type="button" class="btn btn-secondary">Copy JSON</button>
-                    <button id="btn-download" type="button" class="btn btn-primary">Download JSON</button>
-                    <button id="btn-reload" type="button" class="btn btn-secondary">Reload from file</button>
+                    <button id="btn-save" type="button" class="btn btn-primary">Save to Cloud</button>
+                    <button id="btn-validate" type="button" class="btn btn-secondary">Validate JSON</button>
+                    <button id="btn-reload" type="button" class="btn btn-secondary">Reload from Cloud</button>
+                    <button id="btn-import" type="button" class="btn btn-secondary">Import from events.json</button>
+                    <button id="btn-download" type="button" class="btn btn-secondary">Download Backup</button>
                 </div>
                 <textarea id="event-json" class="admin-json-editor" aria-label="Edit event JSON"></textarea>
                 <div id="admin-message" class="admin-message"></div>
             </div>
         </section>
     </main>
-    <script src="admin.js" defer></script>
+    <script type="module" src="admin.js"></script>
 </body>
 </html>

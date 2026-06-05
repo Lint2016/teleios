@@ -526,6 +526,20 @@ const EVENTS_JSON_URL = 'events.json';
 const CHURCH_LOCATION = 'Teleios Church, 42 Antrim Road, Meredale South, Johannesburg';
 
 async function loadEventData() {
+    if (typeof window.teleiosLoadEventData === 'function') {
+        try {
+            const cloudData = await window.teleiosLoadEventData();
+            if (cloudData) {
+                return {
+                    recurringEvents: cloudData.recurringEvents.length ? cloudData.recurringEvents : RECURRING_EVENTS,
+                    specialEvents: cloudData.specialEvents.length ? cloudData.specialEvents : SPECIAL_EVENTS
+                };
+            }
+        } catch (error) {
+            console.warn('Cloud event loader failed, falling back to local data.', error);
+        }
+    }
+
     try {
         const response = await fetch(EVENTS_JSON_URL, { cache: 'no-store' });
         if (!response.ok) {

@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 
-Sitemap: https://teleioschurch.co.za/sitemap.xml
+Sitemap: https://teleios-7bf72.web.app/sitemap.xml

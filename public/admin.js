@@ -1,26 +1,23 @@
-const ADMIN_PASSWORD = 'Teleios2026!';
-const AUTH_STORAGE_KEY = 'teleiosAdminAuthenticated';
-const EVENTS_JSON_URL = 'events.json';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db, EVENTS_DOC_REF, EVENTS_JSON_URL } from './firebase-shared.js';
 
 const adminLogin = document.getElementById('admin-login');
 const loginForm = document.getElementById('login-form');
+const adminEmail = document.getElementById('admin-email');
 const adminPassword = document.getElementById('admin-password');
 const adminEditor = document.getElementById('admin-editor');
 const eventJsonTextarea = document.getElementById('event-json');
 const adminMessage = document.getElementById('admin-message');
+const adminLastUpdated = document.getElementById('admin-last-updated');
+const btnSave = document.getElementById('btn-save');
 const btnValidate = document.getElementById('btn-validate');
-const btnCopy = document.getElementById('btn-copy');
-const btnDownload = document.getElementById('btn-download');
 const btnReload = document.getElementById('btn-reload');
+const btnImport = document.getElementById('btn-import');
+const btnDownload = document.getElementById('btn-download');
 const logoutBtn = document.getElementById('logout-btn');
 
-function isAuthenticated() {
-    return localStorage.getItem(AUTH_STORAGE_KEY) === 'true';
-}
-
-function setAuthenticated(value) {
-    localStorage.setItem(AUTH_STORAGE_KEY, value ? 'true' : 'false');
-}
+const eventsDocRef = doc(db, EVENTS_DOC_REF.collection, EVENTS_DOC_REF.id);
 
 function showLogin() {
     adminLogin.classList.remove('hidden');
@@ -36,7 +33,7 @@ function showEditor() {
     adminEditor.setAttribute('aria-hidden', 'false');
     adminLogin.setAttribute('aria-hidden', 'true');
     adminPassword.value = '';
-    loadEventJson();
+    loadEventsFromCloud();
 }
 
 function showMessage(text, type = 'info') {
@@ -44,18 +41,14 @@ function showMessage(text, type = 'info') {
     adminMessage.className = `admin-message admin-message-${type}`;
 }
 
-async function loadEventJson() {
-    try {
-        const response = await fetch(EVENTS_JSON_URL, { cache: 'no-store' });
-        if (!response.ok) {
-            throw new Error(`Could not load ${EVENTS_JSON_URL}`);
-        }
-        const data = await response.json();
-        eventJsonTextarea.value = JSON.stringify(data, null, 2);
-        showMessage('Event data loaded. Make your changes and validate before downloading.', 'success');
-    } catch (error) {
-        showMessage(`Unable to load ${EVENTS_JSON_URL}. Check the file location and server configuration.`, 'error');
-    }
+function formatUpdatedAt(timestamp) {
+    if (!timestamp || typeof timestamp.toDate !== 'function') return '';
+    return `Last published: ${timestamp.toDate().toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}`;
+}
+
+function setLastUpdated(timestamp) {
+    const label = formatUpdatedAt(timestamp);
+    adminLastUpdated.textContent = label;
 }
 
 function validateJson() {
@@ -67,7 +60,7 @@ function validateJson() {
         if (!Array.isArray(parsed.recurringEvents) || !Array.isArray(parsed.specialEvents)) {
             throw new Error('The JSON object must include recurringEvents and specialEvents arrays.');
         }
-        showMessage('JSON is valid. You can download the updated file now.', 'success');
+        showMessage('JSON is valid.', 'success');
         return parsed;
     } catch (error) {
         showMessage(`Validation failed: ${error.message}`, 'error');
@@ -75,10 +68,71 @@ function validateJson() {
     }
 }
 
-function copyJsonToClipboard() {
-    eventJsonTextarea.select();
-    document.execCommand('copy');
-    showMessage('JSON copied to clipboard. Paste into your editor or deployment file.', 'success');
+async function loadEventsFromCloud() {
+    try {
+        const snapshot = await getDoc(eventsDocRef);
+
+        if (snapshot.exists()) {
+            const data = snapshot.data();
+            eventJsonTextarea.value = JSON.stringify({
+                recurringEvents: data.recurringEvents || [],
+                specialEvents: data.specialEvents || []
+            }, null, 2);
+            setLastUpdated(data.updatedAt);
+            showMessage('Event data loaded from the cloud.', 'success');
+            return;
+        }
+
+        await importFromJsonFile(true);
+    } catch (error) {
+        showMessage(`Could not load cloud events: ${error.message}`, 'error');
+    }
+}
+
+async function importFromJsonFile(isAutoSeed = false) {
+    try {
+        const response = await fetch(EVENTS_JSON_URL, { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error(`Could not load ${EVENTS_JSON_URL}`);
+        }
+
+        const data = await response.json();
+        eventJsonTextarea.value = JSON.stringify(data, null, 2);
+        setLastUpdated(null);
+
+        if (isAutoSeed) {
+            showMessage('No cloud events yet. Loaded events.json — edit and click Save to Cloud to publish.', 'info');
+        } else {
+            showMessage('Imported events.json into the editor. Click Save to Cloud to publish.', 'success');
+        }
+    } catch (error) {
+        showMessage(`Import failed: ${error.message}`, 'error');
+    }
+}
+
+async function saveToCloud() {
+    const parsed = validateJson();
+    if (!parsed) return;
+
+    btnSave.disabled = true;
+    btnSave.textContent = 'Saving…';
+
+    try {
+        await setDoc(eventsDocRef, {
+            recurringEvents: parsed.recurringEvents,
+            specialEvents: parsed.specialEvents,
+            updatedAt: serverTimestamp()
+        });
+
+        const snapshot = await getDoc(eventsDocRef);
+        setLastUpdated(snapshot.data()?.updatedAt);
+        showMessage('Events published! The live site will show your changes on the next page load.', 'success');
+    } catch (error) {
+        showMessage(`Save failed: ${error.message}`, 'error');
+    } finally {
+        btnSave.disabled = false;
+        btnSave.textContent = 'Save to Cloud';
+    }
 }
 
 function downloadJsonFile() {
@@ -94,31 +148,32 @@ function downloadJsonFile() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    showMessage('Download started. Replace the public/events.json file in your deployment.', 'success');
+    showMessage('Backup download started.', 'success');
 }
 
-loginForm.addEventListener('submit', (event) => {
+loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const password = adminPassword.value.trim();
-    if (password === ADMIN_PASSWORD) {
-        setAuthenticated(true);
-        showEditor();
-    } else {
-        showMessage('Incorrect password. Please try again.', 'error');
+    const email = adminEmail.value.trim();
+    const password = adminPassword.value;
+
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+        showMessage('Sign in failed. Check your email and password.', 'error');
     }
 });
 
+btnSave.addEventListener('click', saveToCloud);
 btnValidate.addEventListener('click', validateJson);
-btnCopy.addEventListener('click', copyJsonToClipboard);
+btnReload.addEventListener('click', loadEventsFromCloud);
+btnImport.addEventListener('click', () => importFromJsonFile(false));
 btnDownload.addEventListener('click', downloadJsonFile);
-btnReload.addEventListener('click', loadEventJson);
-logoutBtn.addEventListener('click', () => {
-    setAuthenticated(false);
-    showLogin();
+logoutBtn.addEventListener('click', async () => {
+    await signOut(auth);
 });
 
-window.addEventListener('DOMContentLoaded', () => {
-    if (isAuthenticated()) {
+onAuthStateChanged(auth, (user) => {
+    if (user) {
         showEditor();
         return;
     }

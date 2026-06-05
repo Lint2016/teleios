@@ -1,13 +1,12 @@
 /**
  * Teleios Church — site configuration
- * Update siteUrl when you deploy to your live domain.
+ * Update siteUrl when you register teleioschurch.co.za and point DNS to Firebase.
  */
 window.TELEIOS_CONFIG = {
-    siteUrl: 'https://teleioschurch.co.za',
+    siteUrl: 'https://teleios-7bf72.web.app',
     youtubeChannelId: 'UCIqka1KcckcYRK3DXynQbiw',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UCIqka1KcckcYRK3DXynQbiw',
-    youtubeApiKey: 'AIzaSyCmQrk8Fp5A_FdCURstLr0A_sXSmqQsImU',
     youtubeMaxVideos: 50,
-    /** Optional: public Google Calendar embed URL (iframe src) for events */
-    googleCalendarEmbedUrl: 'https://calendar.google.com/calendar/embed?src=en.sa%23holiday%40group.v.calendar.google.com&ctz=Africa%2FJohannesburg'
+    /** Paste your church Google Calendar embed URL here when ready; leave empty to hide the calendar button */
+    googleCalendarEmbedUrl: ''
 };

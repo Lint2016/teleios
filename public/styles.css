@@ -449,6 +449,11 @@ p {
     font-size: 0.85rem;
 }
 
+/* Hide mobile give button on desktop */
+.nav-give-mobile {
+    display: none;
+}
+
 /* Mobile nav backdrop overlay */
 .nav-backdrop {
     display: none;
@@ -2011,8 +2016,8 @@ p {
 
 .giving-content {
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 40px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
     align-items: stretch;
     margin-top: 40px;
 }
@@ -2217,12 +2222,6 @@ p {
 }
 
 /* PayPal Donation Card — Premium Global Giving */
-.giving-cards-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
 .paypal-donation-card {
     background: linear-gradient(135deg, #0066CC 0%, #003D99 100%);
     color: white;
@@ -2889,7 +2888,7 @@ p {
     
     .giving-content {
         grid-template-columns: 1fr;
-        gap: 30px;
+        gap: 24px;
     }
     
     .giving-how-to-card,
@@ -2899,7 +2898,7 @@ p {
     }
     
     .paypal-donation-buttons {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
     
     .paypal-features {

@@ -10,6 +10,7 @@
     <link rel="shortcut icon" href="images/teleios.jpg" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script type="importmap">
       {
         "imports": {
@@ -29,45 +30,105 @@
                 </div>
                 <div>
                     <h1>Teleios Event Admin</h1>
-                    <p class="admin-subtitle">Edit events and publish directly to the live site — no manual deploy needed.</p>
+                    <p class="admin-subtitle">Add and manage events — changes go live on the website instantly.</p>
                 </div>
             </div>
 
             <div id="admin-login" class="admin-login">
-                <p>Sign in with your Firebase admin account to edit events.</p>
+                <p>Sign in with your admin account to manage events.</p>
                 <form id="login-form" class="admin-form">
-                    <label for="admin-email">Admin email</label>
+                    <label for="admin-email">Email</label>
                     <input id="admin-email" type="email" autocomplete="username" required>
                     <label for="admin-password">Password</label>
                     <input id="admin-password" type="password" autocomplete="current-password" required>
                     <button type="submit" class="btn btn-primary" id="login-btn">Sign In</button>
                 </form>
                 <div id="login-message" class="admin-message" role="status" aria-live="polite"></div>
-                <details id="admin-debug-panel" class="admin-debug-panel" open>
-                    <summary>Debug log (share this if sign-in fails)</summary>
-                    <pre id="admin-debug-log" aria-live="polite">Waiting for admin.js…</pre>
-                </details>
-                <p class="admin-note">This page is not linked from the main site. Create the admin user once in Firebase Console → Authentication.</p>
             </div>
 
             <div id="admin-editor" class="admin-editor hidden" aria-hidden="true">
                 <div class="admin-header">
                     <div>
-                        <h2>Event Editor</h2>
+                        <h2>Manage Events</h2>
                         <p id="admin-last-updated" class="admin-note"></p>
                     </div>
-                    <button id="logout-btn" class="btn btn-secondary">Sign Out</button>
+                    <button id="logout-btn" class="btn btn-secondary admin-logout-btn" type="button">
+                        <i class="fas fa-sign-out-alt"></i> Log Out
+                    </button>
                 </div>
-                <p class="admin-note">Changes are saved to Firebase and appear on the public site within seconds. Use <strong>Save to Cloud</strong> when you are ready to publish.</p>
-                <div class="admin-actions">
-                    <button id="btn-save" type="button" class="btn btn-primary">Save to Cloud</button>
-                    <button id="btn-validate" type="button" class="btn btn-secondary">Validate JSON</button>
-                    <button id="btn-reload" type="button" class="btn btn-secondary">Reload from Cloud</button>
-                    <button id="btn-import" type="button" class="btn btn-secondary">Import from events.json</button>
-                    <button id="btn-download" type="button" class="btn btn-secondary">Download Backup</button>
-                </div>
-                <textarea id="event-json" class="admin-json-editor" aria-label="Edit event JSON"></textarea>
-                <div id="admin-message" class="admin-message"></div>
+
+                <section class="admin-section" aria-label="Weekly services">
+                    <h3 class="admin-section-title">Weekly Services</h3>
+                    <p class="admin-note">These repeat automatically every week on the public site.</p>
+                    <div id="recurring-events-list" class="admin-event-list"></div>
+                </section>
+
+                <section class="admin-section" aria-label="Add special event">
+                    <h3 class="admin-section-title" id="event-form-title">Add Special Event</h3>
+                    <p class="admin-note">Use this form for one-off gatherings — prayer nights, outreach, celebrations, etc.</p>
+                    <form id="event-form" class="admin-event-form">
+                        <input type="hidden" id="event-edit-index" value="">
+                        <div class="admin-form-grid">
+                            <div class="admin-form-field admin-form-field--full">
+                                <label for="event-title">Event name</label>
+                                <input id="event-title" type="text" placeholder="e.g. Youth Outreach Night" required>
+                            </div>
+                            <div class="admin-form-field">
+                                <label for="event-date">Date</label>
+                                <input id="event-date" type="date" required>
+                            </div>
+                            <div class="admin-form-field">
+                                <label for="event-time">Start time</label>
+                                <input id="event-time" type="time" required>
+                            </div>
+                            <div class="admin-form-field">
+                                <label for="event-duration">Duration</label>
+                                <select id="event-duration" required>
+                                    <option value="1">1 hour</option>
+                                    <option value="1.5">1.5 hours</option>
+                                    <option value="2" selected>2 hours</option>
+                                    <option value="3">3 hours</option>
+                                </select>
+                            </div>
+                            <div class="admin-form-field">
+                                <label for="event-category">Category</label>
+                                <select id="event-category" required>
+                                    <option value="Worship">Worship</option>
+                                    <option value="Prayer">Prayer</option>
+                                    <option value="Youth">Youth</option>
+                                    <option value="Fellowship">Fellowship</option>
+                                    <option value="Celebration">Celebration</option>
+                                    <option value="Teaching">Teaching</option>
+                                    <option value="Milestone">Milestone</option>
+                                    <option value="Outreach">Outreach</option>
+                                </select>
+                            </div>
+                            <div class="admin-form-field admin-form-field--full">
+                                <label for="event-location">Location</label>
+                                <input id="event-location" type="text" value="42 Antrim Road, Meredale South" required>
+                            </div>
+                            <div class="admin-form-field admin-form-field--full">
+                                <label for="event-description">Description</label>
+                                <textarea id="event-description" rows="3" placeholder="Brief description visitors will see on the website" required></textarea>
+                            </div>
+                        </div>
+                        <div class="admin-form-actions">
+                            <button type="submit" class="btn btn-primary" id="event-form-submit">
+                                <i class="fas fa-cloud-upload-alt"></i> Save &amp; Publish
+                            </button>
+                            <button type="button" class="btn btn-secondary hidden" id="event-form-cancel">Cancel edit</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="admin-section" aria-label="Upcoming special events">
+                    <h3 class="admin-section-title">Upcoming Special Events</h3>
+                    <div id="special-events-list" class="admin-event-list" aria-live="polite">
+                        <p class="admin-note">Loading events…</p>
+                    </div>
+                </section>
+
+                <div id="admin-message" class="admin-message" role="status" aria-live="polite"></div>
             </div>
         </section>
     </main>

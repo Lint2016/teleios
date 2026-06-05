@@ -2,75 +2,103 @@ import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebas
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db, EVENTS_DOC_REF, EVENTS_JSON_URL } from './firebase-shared.js';
 
-const DEBUG = true;
-const debugLogEl = document.getElementById('admin-debug-log');
+const CATEGORY_PRESETS = {
+    Worship: { categoryColor: '#0066CC', icon: 'fas fa-music' },
+    Prayer: { categoryColor: '#7C3AED', icon: 'fas fa-hands-praying' },
+    Youth: { categoryColor: '#F59E0B', icon: 'fas fa-users' },
+    Fellowship: { categoryColor: '#EC4899', icon: 'fas fa-tree' },
+    Celebration: { categoryColor: '#059669', icon: 'fas fa-dove' },
+    Teaching: { categoryColor: '#7C3AED', icon: 'fas fa-book-open' },
+    Milestone: { categoryColor: '#0891B2', icon: 'fas fa-water' },
+    Outreach: { categoryColor: '#D97706', icon: 'fas fa-hand-holding-heart' }
+};
 
-function adminLog(message, detail) {
-    const time = new Date().toLocaleTimeString('en-ZA');
-    const line = detail !== undefined
-        ? `[${time}] ${message} ${typeof detail === 'string' ? detail : JSON.stringify(detail, null, 2)}`
-        : `[${time}] ${message}`;
-
-    if (DEBUG) console.log('[Teleios Admin]', message, detail !== undefined ? detail : '');
-
-    if (debugLogEl) {
-        debugLogEl.textContent = debugLogEl.textContent === 'Waiting for admin.js…'
-            ? line
-            : `${debugLogEl.textContent}\n${line}`;
-        debugLogEl.scrollTop = debugLogEl.scrollHeight;
+const DEFAULT_RECURRING = [
+    {
+        id: 'sunday-worship',
+        title: 'Sunday Worship Service',
+        dayOfWeek: 0,
+        hour: 9,
+        minute: 0,
+        durationHours: 2,
+        timeLabel: '09:00 AM',
+        recurringLabel: 'Every Sunday',
+        description: 'Join us for inspiring worship, community prayer, and biblical teaching.',
+        category: 'Worship',
+        categoryColor: '#0066CC',
+        icon: 'fas fa-music',
+        location: '42 Antrim Road, Meredale South'
+    },
+    {
+        id: 'wednesday-bible-study',
+        title: 'Bible Study & Fellowship',
+        dayOfWeek: 3,
+        hour: 19,
+        minute: 0,
+        durationHours: 2,
+        timeLabel: '7:00 PM',
+        recurringLabel: 'Every Wednesday',
+        description: 'Deep dive into scripture with interactive discussion and fellowship.',
+        category: 'Teaching',
+        categoryColor: '#7C3AED',
+        icon: 'fas fa-book-open',
+        location: '42 Antrim Road, Meredale South'
     }
-}
+];
 
-function maskEmail(email) {
-    if (!email || !email.includes('@')) return '(empty)';
-    const [user, domain] = email.split('@');
-    return `${user.slice(0, 2)}***@${domain}`;
-}
+const eventsDocRef = doc(db, EVENTS_DOC_REF.collection, EVENTS_DOC_REF.id);
 
-adminLog('admin.js module loaded');
+let recurringEvents = [];
+let specialEvents = [];
+let editingIndex = null;
 
 const adminLogin = document.getElementById('admin-login');
 const loginForm = document.getElementById('login-form');
 const adminEmail = document.getElementById('admin-email');
 const adminPassword = document.getElementById('admin-password');
 const adminEditor = document.getElementById('admin-editor');
-const eventJsonTextarea = document.getElementById('event-json');
-const adminMessage = document.getElementById('admin-message');
 const loginMessage = document.getElementById('login-message');
 const loginBtn = document.getElementById('login-btn');
 const adminLastUpdated = document.getElementById('admin-last-updated');
-const btnSave = document.getElementById('btn-save');
-const btnValidate = document.getElementById('btn-validate');
-const btnReload = document.getElementById('btn-reload');
-const btnImport = document.getElementById('btn-import');
-const btnDownload = document.getElementById('btn-download');
+const adminMessage = document.getElementById('admin-message');
 const logoutBtn = document.getElementById('logout-btn');
+const recurringList = document.getElementById('recurring-events-list');
+const specialList = document.getElementById('special-events-list');
+const eventForm = document.getElementById('event-form');
+const eventFormTitle = document.getElementById('event-form-title');
+const eventEditIndex = document.getElementById('event-edit-index');
+const eventFormCancel = document.getElementById('event-form-cancel');
+const eventFormSubmit = document.getElementById('event-form-submit');
 
-adminLog('DOM elements', {
-    loginForm: !!loginForm,
-    adminEmail: !!adminEmail,
-    adminPassword: !!adminPassword,
-    loginBtn: !!loginBtn,
-    loginMessage: !!loginMessage,
-    adminEditor: !!adminEditor
-});
+function formatTimeLabel(hour, minute) {
+    const date = new Date();
+    date.setHours(hour, minute, 0, 0);
+    return date.toLocaleTimeString('en-ZA', { hour: 'numeric', minute: '2-digit', hour12: true });
+}
 
-adminLog('Firebase project', auth.app?.options?.projectId || 'unknown');
-adminLog('Firestore path', `${EVENTS_DOC_REF.collection}/${EVENTS_DOC_REF.id}`);
+function parseTimeValue(timeValue) {
+    const [hour, minute] = timeValue.split(':').map(Number);
+    return { hour, minute };
+}
 
-const eventsDocRef = doc(db, EVENTS_DOC_REF.collection, EVENTS_DOC_REF.id);
+function formatDisplayDate(dateStr) {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString('en-ZA', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+    });
+}
 
 function showLogin() {
-    adminLog('UI: showing login screen');
     adminLogin.classList.remove('hidden');
     adminEditor.classList.add('hidden');
     adminEditor.setAttribute('aria-hidden', 'true');
     adminLogin.setAttribute('aria-hidden', 'false');
-    if (adminMessage) adminMessage.textContent = '';
 }
 
 function showEditor() {
-    adminLog('UI: showing event editor');
     adminLogin.classList.add('hidden');
     adminEditor.classList.remove('hidden');
     adminEditor.setAttribute('aria-hidden', 'false');
@@ -81,169 +109,296 @@ function showEditor() {
 
 function showMessage(text, type = 'info', target = 'editor') {
     const el = target === 'login' ? loginMessage : adminMessage;
-    adminLog(`Message (${target}/${type})`, text || '(cleared)');
-    if (!el) {
-        adminLog('WARNING: message element missing', { target, type, text });
-        return;
-    }
+    if (!el) return;
     el.textContent = text;
     el.className = `admin-message admin-message-${type}`;
 }
 
-function formatUpdatedAt(timestamp) {
-    if (!timestamp || typeof timestamp.toDate !== 'function') return '';
-    return `Last published: ${timestamp.toDate().toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}`;
+function showSuccessToast(title, text) {
+    if (typeof Swal === 'undefined') {
+        showMessage(text, 'success');
+        return;
+    }
+
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title,
+        text,
+        showConfirmButton: false,
+        timer: 4500,
+        timerProgressBar: true,
+        background: '#0D1B2A',
+        color: '#FAF9F6',
+        iconColor: '#D4AF37'
+    });
 }
 
 function setLastUpdated(timestamp) {
-    const label = formatUpdatedAt(timestamp);
-    adminLastUpdated.textContent = label;
+    if (!timestamp || typeof timestamp.toDate !== 'function') {
+        adminLastUpdated.textContent = '';
+        return;
+    }
+    adminLastUpdated.textContent = `Last published: ${timestamp.toDate().toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}`;
 }
 
-function validateJson() {
-    try {
-        const parsed = JSON.parse(eventJsonTextarea.value);
-        if (!parsed || typeof parsed !== 'object') {
-            throw new Error('The JSON content must be an object.');
-        }
-        if (!Array.isArray(parsed.recurringEvents) || !Array.isArray(parsed.specialEvents)) {
-            throw new Error('The JSON object must include recurringEvents and specialEvents arrays.');
-        }
-        showMessage('JSON is valid.', 'success');
-        return parsed;
-    } catch (error) {
-        showMessage(`Validation failed: ${error.message}`, 'error');
-        return null;
+function buildSpecialEventFromForm() {
+    const title = document.getElementById('event-title').value.trim();
+    const date = document.getElementById('event-date').value;
+    const time = document.getElementById('event-time').value;
+    const durationHours = parseFloat(document.getElementById('event-duration').value);
+    const category = document.getElementById('event-category').value;
+    const location = document.getElementById('event-location').value.trim();
+    const description = document.getElementById('event-description').value.trim();
+    const { hour, minute } = parseTimeValue(time);
+    const preset = CATEGORY_PRESETS[category] || CATEGORY_PRESETS.Worship;
+
+    return {
+        title,
+        date,
+        hour,
+        minute,
+        durationHours,
+        timeLabel: formatTimeLabel(hour, minute),
+        description,
+        category,
+        categoryColor: preset.categoryColor,
+        icon: preset.icon,
+        location
+    };
+}
+
+function resetEventForm() {
+    eventForm.reset();
+    const dateInput = document.getElementById('event-date');
+    if (dateInput) dateInput.min = new Date().toISOString().split('T')[0];
+    document.getElementById('event-location').value = '42 Antrim Road, Meredale South';
+    document.getElementById('event-duration').value = '2';
+    eventEditIndex.value = '';
+    editingIndex = null;
+    eventFormTitle.textContent = 'Add Special Event';
+    eventFormSubmit.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Save &amp; Publish';
+    eventFormCancel.classList.add('hidden');
+}
+
+function fillEventForm(event, index) {
+    document.getElementById('event-title').value = event.title;
+    document.getElementById('event-date').value = event.date;
+    document.getElementById('event-time').value = `${String(event.hour).padStart(2, '0')}:${String(event.minute).padStart(2, '0')}`;
+    document.getElementById('event-duration').value = String(event.durationHours);
+    document.getElementById('event-category').value = event.category || 'Worship';
+    document.getElementById('event-location').value = event.location || '42 Antrim Road, Meredale South';
+    document.getElementById('event-description').value = event.description || '';
+    eventEditIndex.value = String(index);
+    editingIndex = index;
+    eventFormTitle.textContent = 'Edit Special Event';
+    eventFormSubmit.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Update &amp; Publish';
+    eventFormCancel.classList.remove('hidden');
+    eventForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderRecurringEvents() {
+    if (!recurringList) return;
+
+    if (!recurringEvents.length) {
+        recurringList.innerHTML = '<p class="admin-note">No weekly services configured.</p>';
+        return;
     }
+
+    recurringList.innerHTML = recurringEvents.map((event) => `
+        <article class="admin-event-card admin-event-card--recurring">
+            <div class="admin-event-card-main">
+                <h4>${event.title}</h4>
+                <p class="admin-event-meta"><i class="fas fa-redo"></i> ${event.recurringLabel}</p>
+                <p class="admin-event-meta"><i class="fas fa-clock"></i> ${event.timeLabel}</p>
+                <p class="admin-event-meta"><i class="fas fa-map-marker-alt"></i> ${event.location}</p>
+            </div>
+        </article>
+    `).join('');
+}
+
+function renderSpecialEvents() {
+    if (!specialList) return;
+
+    const now = new Date();
+    const upcoming = specialEvents
+        .map((event, index) => ({ event, index }))
+        .filter(({ event }) => {
+            const [year, month, day] = event.date.split('-').map(Number);
+            const start = new Date(year, month - 1, day, event.hour, event.minute);
+            return start > now;
+        })
+        .sort((a, b) => {
+            const dateA = new Date(`${a.event.date}T${String(a.event.hour).padStart(2, '0')}:${String(a.event.minute).padStart(2, '0')}`);
+            const dateB = new Date(`${b.event.date}T${String(b.event.hour).padStart(2, '0')}:${String(b.event.minute).padStart(2, '0')}`);
+            return dateA - dateB;
+        });
+
+    if (!upcoming.length) {
+        specialList.innerHTML = '<p class="admin-note">No upcoming special events yet. Add one using the form above.</p>';
+        return;
+    }
+
+    specialList.innerHTML = upcoming.map(({ event, index }) => `
+        <article class="admin-event-card">
+            <div class="admin-event-card-main">
+                <div class="admin-event-card-header">
+                    <h4>${event.title}</h4>
+                    <span class="admin-event-badge" style="background:${event.categoryColor}">${event.category}</span>
+                </div>
+                <p class="admin-event-meta"><i class="fas fa-calendar-day"></i> ${formatDisplayDate(event.date)} at ${event.timeLabel}</p>
+                <p class="admin-event-meta"><i class="fas fa-map-marker-alt"></i> ${event.location}</p>
+                <p class="admin-event-desc">${event.description}</p>
+            </div>
+            <div class="admin-event-card-actions">
+                <button type="button" class="btn btn-secondary btn-sm" data-edit-index="${index}">Edit</button>
+                <button type="button" class="btn btn-secondary btn-sm admin-btn-danger" data-delete-index="${index}">Delete</button>
+            </div>
+        </article>
+    `).join('');
+
+    specialList.querySelectorAll('[data-edit-index]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const index = Number(button.dataset.editIndex);
+            fillEventForm(specialEvents[index], index);
+        });
+    });
+
+    specialList.querySelectorAll('[data-delete-index]').forEach((button) => {
+        button.addEventListener('click', () => handleDeleteEvent(Number(button.dataset.deleteIndex)));
+    });
+}
+
+async function saveEventsToCloud(successTitle, successText) {
+    await setDoc(eventsDocRef, {
+        recurringEvents,
+        specialEvents,
+        updatedAt: serverTimestamp()
+    });
+
+    const snapshot = await getDoc(eventsDocRef);
+    setLastUpdated(snapshot.data()?.updatedAt);
+    renderRecurringEvents();
+    renderSpecialEvents();
+    showSuccessToast(successTitle, successText);
+    showMessage(successText, 'success');
 }
 
 async function loadEventsFromCloud() {
-    adminLog('Loading events from Firestore…');
+    showMessage('Loading events…', 'info');
+
     try {
         const snapshot = await getDoc(eventsDocRef);
 
         if (snapshot.exists()) {
             const data = snapshot.data();
-            adminLog('Firestore document found', {
-                recurringCount: (data.recurringEvents || []).length,
-                specialCount: (data.specialEvents || []).length,
-                hasUpdatedAt: !!data.updatedAt
-            });
-            eventJsonTextarea.value = JSON.stringify({
-                recurringEvents: data.recurringEvents || [],
-                specialEvents: data.specialEvents || []
-            }, null, 2);
+            recurringEvents = Array.isArray(data.recurringEvents) && data.recurringEvents.length
+                ? data.recurringEvents
+                : DEFAULT_RECURRING;
+            specialEvents = Array.isArray(data.specialEvents) ? data.specialEvents : [];
             setLastUpdated(data.updatedAt);
-            showMessage('Event data loaded from the cloud.', 'success');
-            return;
-        }
-
-        adminLog('No Firestore document yet — importing events.json');
-        await importFromJsonFile(true);
-    } catch (error) {
-        adminLog('Firestore load FAILED', { code: error.code, message: error.message });
-        showMessage(`Could not load cloud events: ${error.message}`, 'error');
-    }
-}
-
-async function importFromJsonFile(isAutoSeed = false) {
-    adminLog('Importing from events.json…');
-    try {
-        const response = await fetch(EVENTS_JSON_URL, { cache: 'no-store' });
-        if (!response.ok) {
-            throw new Error(`Could not load ${EVENTS_JSON_URL}`);
-        }
-
-        const data = await response.json();
-        eventJsonTextarea.value = JSON.stringify(data, null, 2);
-        setLastUpdated(null);
-        adminLog('events.json imported', {
-            recurringCount: (data.recurringEvents || []).length,
-            specialCount: (data.specialEvents || []).length
-        });
-
-        if (isAutoSeed) {
-            showMessage('No cloud events yet. Loaded events.json — edit and click Save to Cloud to publish.', 'info');
         } else {
-            showMessage('Imported events.json into the editor. Click Save to Cloud to publish.', 'success');
+            await loadFromJsonFallback();
         }
+
+        renderRecurringEvents();
+        renderSpecialEvents();
+        showMessage('', 'info');
     } catch (error) {
-        adminLog('events.json import FAILED', { message: error.message });
-        showMessage(`Import failed: ${error.message}`, 'error');
+        showMessage(`Could not load events: ${error.message}`, 'error');
     }
 }
 
-async function saveToCloud() {
-    const parsed = validateJson();
-    if (!parsed) return;
+async function loadFromJsonFallback() {
+    const response = await fetch(EVENTS_JSON_URL, { cache: 'no-store' });
+    if (!response.ok) {
+        recurringEvents = [...DEFAULT_RECURRING];
+        specialEvents = [];
+        return;
+    }
 
-    btnSave.disabled = true;
-    btnSave.textContent = 'Saving…';
-    adminLog('Saving to Firestore…');
+    const data = await response.json();
+    recurringEvents = Array.isArray(data.recurringEvents) && data.recurringEvents.length
+        ? data.recurringEvents
+        : DEFAULT_RECURRING;
+    specialEvents = Array.isArray(data.specialEvents) ? data.specialEvents : [];
+}
+
+async function handleEventFormSubmit(event) {
+    event.preventDefault();
+
+    const submitBtn = eventFormSubmit;
+    submitBtn.disabled = true;
+    const originalHtml = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing…';
 
     try {
-        await setDoc(eventsDocRef, {
-            recurringEvents: parsed.recurringEvents,
-            specialEvents: parsed.specialEvents,
-            updatedAt: serverTimestamp()
+        const newEvent = buildSpecialEventFromForm();
+        const editIdx = eventEditIndex.value !== '' ? Number(eventEditIndex.value) : null;
+
+        if (editIdx !== null && !Number.isNaN(editIdx)) {
+            specialEvents[editIdx] = newEvent;
+        } else {
+            specialEvents.push(newEvent);
+        }
+
+        specialEvents.sort((a, b) => {
+            const dateA = new Date(`${a.date}T${String(a.hour).padStart(2, '0')}:${String(a.minute).padStart(2, '0')}`);
+            const dateB = new Date(`${b.date}T${String(b.hour).padStart(2, '0')}:${String(b.minute).padStart(2, '0')}`);
+            return dateA - dateB;
         });
 
-        const snapshot = await getDoc(eventsDocRef);
-        setLastUpdated(snapshot.data()?.updatedAt);
-        adminLog('Save SUCCESS');
-        showMessage('Events published! The live site will show your changes on the next page load.', 'success');
+        await saveEventsToCloud(
+            editIdx !== null ? 'Event updated!' : 'Event published!',
+            editIdx !== null
+                ? `"${newEvent.title}" is now live on the website.`
+                : `"${newEvent.title}" has been added to the website.`
+        );
+
+        resetEventForm();
     } catch (error) {
-        adminLog('Save FAILED', { code: error.code, message: error.message });
         showMessage(`Save failed: ${error.message}`, 'error');
     } finally {
-        btnSave.disabled = false;
-        btnSave.textContent = 'Save to Cloud';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalHtml;
     }
 }
 
-function downloadJsonFile() {
-    const parsed = validateJson();
-    if (!parsed) return;
+async function handleDeleteEvent(index) {
+    const event = specialEvents[index];
+    if (!event) return;
 
-    const blob = new Blob([JSON.stringify(parsed, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'events.json';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    showMessage('Backup download started.', 'success');
+    const confirmed = typeof Swal !== 'undefined'
+        ? (await Swal.fire({
+            title: 'Delete this event?',
+            text: `"${event.title}" will be removed from the website.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#b91c1c',
+            cancelButtonColor: '#6c757d'
+        })).isConfirmed
+        : window.confirm(`Delete "${event.title}"?`);
+
+    if (!confirmed) return;
+
+    specialEvents.splice(index, 1);
+
+    try {
+        await saveEventsToCloud('Event deleted', `"${event.title}" has been removed from the website.`);
+        if (editingIndex === index) resetEventForm();
+    } catch (error) {
+        showMessage(`Delete failed: ${error.message}`, 'error');
+    }
 }
 
-if (!loginForm) {
-    adminLog('ERROR: login form not found — admin.js may not be wired to the page');
-    console.error('Admin login form not found — admin.js may have loaded before the DOM.');
-} else {
-    adminLog('Login form listener attached');
-
-    loginForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
+if (loginForm) {
+    loginForm.addEventListener('submit', async (submitEvent) => {
+        submitEvent.preventDefault();
         const email = adminEmail.value.trim();
         const password = adminPassword.value;
-
-        adminLog('Sign In clicked', {
-            email: maskEmail(email),
-            passwordLength: password.length
-        });
-
-        if (!email) {
-            showMessage('Enter your admin email.', 'error', 'login');
-            adminLog('Blocked: empty email');
-            return;
-        }
-
-        if (!password) {
-            showMessage('Enter your password.', 'error', 'login');
-            adminLog('Blocked: empty password');
-            return;
-        }
 
         if (loginBtn) {
             loginBtn.disabled = true;
@@ -252,43 +407,12 @@ if (!loginForm) {
         showMessage('Signing in…', 'info', 'login');
 
         try {
-            adminLog('Calling signInWithEmailAndPassword…');
-            const credential = await signInWithEmailAndPassword(auth, email, password);
-            adminLog('signInWithEmailAndPassword SUCCESS', {
-                uid: credential.user.uid,
-                email: maskEmail(credential.user.email)
-            });
+            await signInWithEmailAndPassword(auth, email, password);
             showMessage('', 'info', 'login');
         } catch (error) {
-            adminLog('signInWithEmailAndPassword FAILED', {
-                code: error.code,
-                message: error.message
-            });
-            console.error('Admin sign-in failed:', error);
-
-            let hint;
-            switch (error.code) {
-                case 'auth/invalid-credential':
-                case 'auth/wrong-password':
-                case 'auth/user-not-found':
-                    hint = 'Incorrect email or password. Check Firebase Console → Authentication → Users.';
-                    break;
-                case 'auth/invalid-email':
-                    hint = 'Invalid email format.';
-                    break;
-                case 'auth/too-many-requests':
-                    hint = 'Too many attempts. Wait a moment and try again.';
-                    break;
-                case 'auth/network-request-failed':
-                    hint = 'Network error. Check your internet connection.';
-                    break;
-                case 'auth/operation-not-allowed':
-                    hint = 'Email/Password sign-in is not enabled. Enable it in Firebase Console → Authentication.';
-                    break;
-                default:
-                    hint = `Sign in failed (${error.code || 'unknown'}): ${error.message}`;
-            }
-
+            const hint = error.code === 'auth/operation-not-allowed'
+                ? 'Email/Password sign-in is not enabled in Firebase.'
+                : 'Incorrect email or password.';
             showMessage(hint, 'error', 'login');
         } finally {
             if (loginBtn) {
@@ -299,35 +423,19 @@ if (!loginForm) {
     });
 }
 
-if (btnSave) btnSave.addEventListener('click', saveToCloud);
-if (btnValidate) btnValidate.addEventListener('click', validateJson);
-if (btnReload) btnReload.addEventListener('click', loadEventsFromCloud);
-if (btnImport) btnImport.addEventListener('click', () => importFromJsonFile(false));
-if (btnDownload) btnDownload.addEventListener('click', downloadJsonFile);
+if (eventForm) eventForm.addEventListener('submit', handleEventFormSubmit);
+if (eventFormCancel) eventFormCancel.addEventListener('click', resetEventForm);
 if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
-        adminLog('Sign out clicked');
         await signOut(auth);
+        resetEventForm();
     });
 }
 
-adminLog('Setting up onAuthStateChanged listener…');
-
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        adminLog('Auth state: SIGNED IN', {
-            uid: user.uid,
-            email: maskEmail(user.email)
-        });
         showEditor();
         return;
     }
-
-    adminLog('Auth state: SIGNED OUT');
     showLogin();
-}, (error) => {
-    adminLog('onAuthStateChanged ERROR', { code: error.code, message: error.message });
-    showMessage(`Auth error: ${error.message}`, 'error', 'login');
 });
-
-adminLog('Admin init complete — try signing in');

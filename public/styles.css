@@ -1270,36 +1270,188 @@ p {
     color: #065f46;
 }
 
+.admin-message-info {
+    color: var(--medium-text);
+}
+
 .admin-message-error {
     color: #b91c1c;
 }
 
-.admin-debug-panel {
-    margin-top: 16px;
-    max-width: 520px;
-    border: 1px solid rgba(13, 27, 42, 0.12);
-    border-radius: var(--border-radius);
-    background: #f8fafc;
-    padding: 12px 14px;
+.admin-logout-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
 }
 
-.admin-debug-panel summary {
-    cursor: pointer;
-    font-weight: 600;
-    color: var(--deep-blue);
+.admin-section {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(13, 27, 42, 0.08);
+}
+
+.admin-section-title {
+    font-family: var(--heading-font);
+    font-size: 1.35rem;
     margin-bottom: 8px;
+    color: var(--deep-blue);
 }
 
-.admin-debug-panel pre {
+.admin-event-form {
+    margin-top: 16px;
+}
+
+.admin-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.admin-form-field {
+    display: grid;
+    gap: 6px;
+}
+
+.admin-form-field--full {
+    grid-column: 1 / -1;
+}
+
+.admin-form-field label {
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+
+.admin-form-field input,
+.admin-form-field select,
+.admin-form-field textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid rgba(13, 27, 42, 0.15);
+    border-radius: var(--border-radius);
+    font-family: inherit;
+    font-size: 1rem;
+    background: #fff;
+}
+
+.admin-form-field textarea {
+    resize: vertical;
+    min-height: 96px;
+}
+
+.admin-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.admin-event-list {
+    display: grid;
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.admin-event-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 18px;
+    border: 1px solid rgba(13, 27, 42, 0.1);
+    border-radius: var(--border-radius);
+    background: var(--light);
+}
+
+.admin-event-card--recurring {
+    background: #f8fafc;
+}
+
+.admin-event-card-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-event-card-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.admin-event-card h4 {
     margin: 0;
-    max-height: 220px;
-    overflow: auto;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-    font-size: 0.8rem;
-    line-height: 1.45;
-    white-space: pre-wrap;
-    word-break: break-word;
-    color: #334155;
+    font-size: 1.05rem;
+    color: var(--deep-blue);
+}
+
+.admin-event-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.admin-event-meta {
+    margin: 4px 0 0;
+    color: var(--medium-text);
+    font-size: 0.92rem;
+}
+
+.admin-event-meta i {
+    width: 16px;
+    margin-right: 6px;
+    color: var(--gold);
+}
+
+.admin-event-desc {
+    margin: 10px 0 0;
+    color: var(--medium-text);
+    line-height: 1.5;
+}
+
+.admin-event-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-sm {
+    padding: 8px 14px;
+    font-size: 0.88rem;
+}
+
+.admin-btn-danger {
+    color: #b91c1c;
+    border-color: rgba(185, 28, 28, 0.25);
+}
+
+.admin-btn-danger:hover {
+    background: #fef2f2;
+}
+
+@media (max-width: 768px) {
+    .admin-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-event-card {
+        flex-direction: column;
+    }
+
+    .admin-event-card-actions {
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 .hidden {

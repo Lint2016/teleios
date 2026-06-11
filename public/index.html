@@ -29,6 +29,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
     <script type="importmap">
       {
         "imports": {
@@ -366,7 +368,27 @@
             </div>
             <div id="google-calendar-embed" class="google-calendar-embed hidden" aria-hidden="true"></div>
             <div class="events-grid" id="events-grid" aria-live="polite">
-                <p class="events-loading">Loading upcoming events…</p>
+                <div class="event-card skeleton-card">
+                    <div class="skeleton-img"></div>
+                    <div class="event-content">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                    </div>
+                </div>
+                <div class="event-card skeleton-card">
+                    <div class="skeleton-img"></div>
+                    <div class="event-content">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                    </div>
+                </div>
+                <div class="event-card skeleton-card">
+                    <div class="skeleton-img"></div>
+                    <div class="event-content">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -393,7 +415,30 @@
                 </div>
             </div>
             <div class="sermons-grid" id="sermons-grid" aria-live="polite">
-                <p class="sermons-loading">Loading sermons from YouTube…</p>
+                <div class="sermon-card skeleton-card">
+                    <div class="skeleton-img"></div>
+                    <div class="sermon-content">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                        <div class="skeleton-button"></div>
+                    </div>
+                </div>
+                <div class="sermon-card skeleton-card">
+                    <div class="skeleton-img"></div>
+                    <div class="sermon-content">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                        <div class="skeleton-button"></div>
+                    </div>
+                </div>
+                <div class="sermon-card skeleton-card">
+                    <div class="skeleton-img"></div>
+                    <div class="sermon-content">
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text short"></div>
+                        <div class="skeleton-button"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -730,6 +775,20 @@
     <button id="back-to-top" class="back-to-top" aria-label="Back to top">
         <i class="fas fa-chevron-up"></i>
     </button>
+
+    <!-- Persistent Global Media Player -->
+    <div id="persistent-player" class="persistent-player">
+        <div class="player-container">
+            <div id="player-youtube-container"></div>
+            <div class="player-info">
+                <h4 id="player-title">Sermon Title</h4>
+                <p id="player-speaker">Speaker</p>
+            </div>
+            <div class="player-controls">
+                <button id="player-close" aria-label="Close Player"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">

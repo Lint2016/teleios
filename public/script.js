@@ -109,40 +109,23 @@ function updateActiveNavLink() {
     });
 }
 // ============================================
-// Video Modal Functionality
+// Persistent Media Player Functionality
 // ============================================
-function initializeVideoModal() {
-    const modalElement = document.getElementById('videoModal');
-    const closeButton = document.getElementById('closeModal');
+function initializePersistentPlayer() {
+    const playerEl = document.getElementById('persistent-player');
+    const container = document.getElementById('player-youtube-container');
+    const closeBtn = document.getElementById('player-close');
+    const titleEl = document.getElementById('player-title');
+    const speakerEl = document.getElementById('player-speaker');
     
-    if (!modalElement || !closeButton) return;
+    if (!playerEl || !container) return;
 
-    videoModal = modalElement;
-    closeBtn = closeButton;
-    iframe = document.getElementById('videoIframe');
-    
-    const closeModal = () => {
-        videoModal.classList.remove('show');
-        const frame = videoModal.querySelector('iframe');
-        if (frame) frame.src = '';
-        document.body.style.overflow = 'auto';
+    const closePlayer = () => {
+        playerEl.classList.remove('active');
+        container.innerHTML = '';
     };
 
-    // Initialize close button (click + keyboard)
-    closeBtn.addEventListener('click', closeModal);
-    closeBtn.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            closeModal();
-        }
-    });
-    
-    // Close when clicking outside the modal content
-    videoModal.addEventListener('click', function(e) {
-        if (e.target === videoModal) {
-            closeModal();
-        }
-    });
+    closeBtn.addEventListener('click', closePlayer);
     
     function openSermonVideo(card) {
         if (!card) {
@@ -156,13 +139,15 @@ function initializeVideoModal() {
             return;
         }
 
-        const frame = document.getElementById('videoIframe');
-        if (frame) {
-            frame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-            videoModal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-            closeBtn.focus();
-        }
+        const title = card.querySelector('h3')?.textContent || 'Sermon Title';
+        const speaker = card.querySelector('.sermon-date')?.textContent || 'Teleios Church';
+
+        titleEl.textContent = title;
+        speakerEl.textContent = speaker;
+
+        container.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        
+        playerEl.classList.add('active');
     }
 
     const sermonsGrid = document.getElementById('sermons-grid');
@@ -183,8 +168,11 @@ document.addEventListener('DOMContentLoaded', function() {
     iframe = document.getElementById('videoIframe');
     closeBtn = document.getElementById('closeModal');
     
+    if (typeof gsap !== 'undefined') {
+        initializeGSAP();
+    }
     initializeNavigation();
-    initializeVideoModal();
+    initializePersistentPlayer();
     initializeFormAnimations();
     updateActiveNavLink();
     initializeScrollHandlers();
@@ -205,6 +193,61 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.classList.add('loaded');
     }, 1000);
 });
+
+// ============================================
+// GSAP Micro-animations
+// ============================================
+function initializeGSAP() {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Fade in hero content
+    gsap.fromTo(".hero-title", 
+        { y: 30, opacity: 0 }, 
+        { y: 0, opacity: 1, duration: 1, ease: "power3.out", delay: 0.2 }
+    );
+    gsap.fromTo(".hero-subtitle, .hero-verse", 
+        { y: 20, opacity: 0 }, 
+        { y: 0, opacity: 1, duration: 1, ease: "power3.out", stagger: 0.2, delay: 0.4 }
+    );
+
+    // Reveal Sections
+    const sections = gsap.utils.toArray('section:not(.hero)');
+    sections.forEach(section => {
+        gsap.fromTo(section, 
+            { y: 40, opacity: 0 }, 
+            { 
+                y: 0, 
+                opacity: 1, 
+                duration: 1, 
+                ease: "power3.out", 
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                }
+            }
+        );
+    });
+
+    // Stagger Cards (Values, Ministries, Leaders, Events)
+    const grids = gsap.utils.toArray('.values-grid, .ministries-grid, .leaders-grid, .visit-grid');
+    grids.forEach(grid => {
+        gsap.fromTo(grid.children, 
+            { y: 30, opacity: 0 }, 
+            { 
+                y: 0, 
+                opacity: 1, 
+                duration: 0.8, 
+                stagger: 0.1, 
+                ease: "power2.out", 
+                scrollTrigger: {
+                    trigger: grid,
+                    start: "top 85%"
+                }
+            }
+        );
+    });
+}
 
 // ============================================
 // Navigation Functionality

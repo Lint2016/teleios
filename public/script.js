@@ -812,7 +812,7 @@ function createEventCard(event) {
 
     const onlineMarkup = isOnline && event.onlineUrl
         ? `<a href="${event.onlineUrl}" class="event-online-link" target="_blank" rel="noopener noreferrer">
-            <i class="fas fa-play-circle"></i> Join online
+            <i class="fa-solid fa-church"></i> Join Community
            </a>`
         : '';
 

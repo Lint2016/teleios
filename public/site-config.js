@@ -7,6 +7,7 @@ window.TELEIOS_CONFIG = {
     youtubeChannelId: 'UCIqka1KcckcYRK3DXynQbiw',
     youtubeChannelUrl: 'https://www.youtube.com/channel/UCIqka1KcckcYRK3DXynQbiw',
     youtubeMaxVideos: 50,
+    youtubeApiKey: 'AIzaSyCsrKbRJNj75elkIp8gPq6IqBCIBSEA1CE',
     /** Paste your church Google Calendar embed URL here when ready; leave empty to hide the calendar button */
     googleCalendarEmbedUrl: ''
 };

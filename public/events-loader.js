@@ -9,6 +9,13 @@ function normalizeEventData(data) {
 
     if (!recurringEvents.length && !specialEvents.length) return null;
 
+    // Failsafe: Ensure wednesday-bible-study uses the community link, even if the database has the old YouTube link
+    recurringEvents.forEach(event => {
+        if (event.id === 'wednesday-bible-study' && event.onlineUrl && event.onlineUrl.includes('youtube.com')) {
+            event.onlineUrl = 'https://teleioscommunity.mn.co/';
+        }
+    });
+
     return { recurringEvents, specialEvents };
 }
 

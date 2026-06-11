@@ -45,7 +45,7 @@ const DEFAULT_RECURRING = [
         icon: 'fas fa-video',
         location: 'Online',
         isOnline: true,
-        onlineUrl: 'https://www.youtube.com/channel/UCIqka1KcckcYRK3DXynQbiw'
+        onlineUrl: 'https://teleioscommunity.mn.co/'
     }
 ];
 

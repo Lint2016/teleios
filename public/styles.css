@@ -660,6 +660,16 @@ p {
     animation: fadeIn 1.5s ease-out forwards, kenBurns 24s ease-in-out 1.5s infinite;
 }
 
+.hero-image.crossfade-img {
+    animation: kenBurns 24s ease-in-out 1.5s infinite, crossfadeOpacity 16s ease-in-out infinite;
+}
+
+@keyframes crossfadeOpacity {
+    0%, 35% { opacity: 0; }
+    45%, 85% { opacity: 1; }
+    95%, 100% { opacity: 0; }
+}
+
 .hero-overlay {
     position: absolute;
     top: 0;

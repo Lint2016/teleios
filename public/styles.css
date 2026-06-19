@@ -1109,6 +1109,7 @@ p {
     transform: translateY(-4px);
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(212, 175, 55, 0.35);
+    box-shadow: var(--shadow-heavy);
 }
 
 .visit-card i {
@@ -2122,7 +2123,7 @@ p {
     transform: translateY(-6px) scale(1.02);
     background: rgba(255, 255, 255, 0.12);
     border-color: rgba(212, 175, 55, 0.35);
-    box-shadow: 0 20px 40px rgba(13, 27, 42, 0.15);
+    box-shadow: 0 25px 50px rgba(13, 27, 42, 0.2);
 }
 
 .ministry-card i {
@@ -3510,18 +3511,18 @@ p {
 .skeleton-img {
     height: 200px;
     width: 100%;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background: linear-gradient(90deg, #f0f0f0 25%, #f8f9fa 50%, #f0f0f0 75%);
     background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
 }
 .skeleton-text {
     height: 16px;
     margin: 15px 20px 0;
     width: 80%;
     border-radius: 4px;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background: linear-gradient(90deg, #f0f0f0 25%, #f8f9fa 50%, #f0f0f0 75%);
     background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
 }
 .skeleton-text.short {
     width: 50%;
@@ -3532,9 +3533,9 @@ p {
     width: 120px;
     margin: 20px;
     border-radius: var(--border-radius);
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background: linear-gradient(90deg, #f0f0f0 25%, #f8f9fa 50%, #f0f0f0 75%);
     background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
 }
 @keyframes skeleton-loading {
     0% { background-position: 200% 0; }
@@ -3638,5 +3639,76 @@ p {
     }
     #player-close {
         font-size: 1.2rem;
+    }
+}
+
+/* 4. Welcome Toast */
+.welcome-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    background: var(--warm-white);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow-heavy);
+    width: 300px;
+    z-index: 1100;
+    transform: translateX(-150%);
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.welcome-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.welcome-toast .toast-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--medium-text);
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.welcome-toast .toast-close:hover {
+    color: var(--accent-red);
+}
+
+.welcome-toast h4 {
+    font-size: 1.1rem;
+    color: var(--church-blue);
+    margin-bottom: 8px;
+    margin-top: 0;
+}
+
+.welcome-toast p {
+    font-size: 0.9rem;
+    color: var(--medium-text);
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.welcome-toast .btn-sm {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .welcome-toast {
+        left: 50%;
+        bottom: 85px;
+        transform: translate(-50%, 150%);
+        width: 90%;
+        max-width: 350px;
+    }
+    .welcome-toast.show {
+        transform: translate(-50%, 0);
     }
 }

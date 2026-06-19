@@ -183,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeUpcomingEvents();
     initializeSundayCountdown();
     initializeEventsCalendarToggle();
+    initializeWelcomeToast();
 
     if (typeof initializeYouTubeSermons === 'function') {
         initializeYouTubeSermons();
@@ -820,7 +821,7 @@ function createEventCard(event) {
         ? ''
         : (() => {
             const rsvpText = encodeURIComponent(`Hi Teleios Church, I would like to RSVP for ${event.title} at ${event.timeLabel}.`);
-            const rsvpUrl = `https://wa.me/27671630558?text=${rsvpText}`;
+            const rsvpUrl = `https://wa.me/27761369924?text=${rsvpText}`;
             return `<a href="${rsvpUrl}" class="event-link event-rsvp-btn" target="_blank" rel="noopener noreferrer" title="RSVP via WhatsApp">
                 <i class="fas fa-check-circle"></i> RSVP
             </a>`;
@@ -1410,6 +1411,42 @@ document.addEventListener('DOMContentLoaded', () => {
     initializePayPalButtons();
 });
 
+// ============================================
+// Welcome Toast Logic
+// ============================================
+function initializeWelcomeToast() {
+    const toast = document.getElementById('welcome-toast');
+    if (!toast) return;
 
+    // Check if user has already dismissed it this session
+    if (sessionStorage.getItem('welcomeToastDismissed')) return;
 
+    let toastShown = false;
 
+    const showToast = () => {
+        if (!toastShown) {
+            toast.classList.add('show');
+            toastShown = true;
+        }
+    };
+
+    // Show after 15 seconds of scrolling
+    let scrollTimer;
+    window.addEventListener('scroll', () => {
+        if (!toastShown) {
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(showToast, 15000);
+        }
+    });
+
+    // Alternatively, show after 20 seconds regardless
+    setTimeout(showToast, 20000);
+
+    const closeBtn = toast.querySelector('.toast-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            toast.classList.remove('show');
+            sessionStorage.setItem('welcomeToastDismissed', 'true');
+        });
+    }
+}

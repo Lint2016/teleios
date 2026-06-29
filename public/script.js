@@ -109,48 +109,37 @@ function updateActiveNavLink() {
     });
 }
 // ============================================
-// Persistent Media Player Functionality
+// Video Modal Functionality
 // ============================================
-function initializePersistentPlayer() {
-    const playerEl = document.getElementById('persistent-player');
-    const container = document.getElementById('player-youtube-container');
-    const closeBtn = document.getElementById('player-close');
-    const titleEl = document.getElementById('player-title');
-    const speakerEl = document.getElementById('player-speaker');
+function initializeVideoModal() {
+    const sermonsGrid = document.getElementById('sermons-grid');
     
-    if (!playerEl || !container) return;
+    if (!videoModal || !iframe || !closeBtn) return;
 
-    const closePlayer = () => {
-        playerEl.classList.remove('active');
-        container.innerHTML = '';
+    const closeVideoModal = () => {
+        videoModal.classList.remove('show');
+        iframe.src = '';
+        document.body.style.overflow = 'auto';
     };
 
-    closeBtn.addEventListener('click', closePlayer);
+    closeBtn.addEventListener('click', closeVideoModal);
+    videoModal.addEventListener('click', (e) => {
+        if (e.target === videoModal) {
+            closeVideoModal();
+        }
+    });
     
     function openSermonVideo(card) {
-        if (!card) {
-            showNotification('Error: Could not find sermon information', 'error');
-            return;
-        }
+        if (!card) return;
 
         const videoId = card.getAttribute('data-video-id');
-        if (!videoId) {
-            showNotification('Error: No video available', 'error');
-            return;
-        }
+        if (!videoId) return;
 
-        const title = card.querySelector('h3')?.textContent || 'Sermon Title';
-        const speaker = card.querySelector('.sermon-date')?.textContent || 'Teleios Church';
-
-        titleEl.textContent = title;
-        speakerEl.textContent = speaker;
-
-        container.innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-        
-        playerEl.classList.add('active');
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+        videoModal.classList.add('show');
+        document.body.style.overflow = 'hidden';
     }
 
-    const sermonsGrid = document.getElementById('sermons-grid');
     if (sermonsGrid) {
         sermonsGrid.addEventListener('click', (e) => {
             const trigger = e.target.closest('.btn-video, .sermon-play-overlay');
@@ -172,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeGSAP();
     }
     initializeNavigation();
-    initializePersistentPlayer();
+    initializeVideoModal();
     initializeFormAnimations();
     updateActiveNavLink();
     initializeScrollHandlers();

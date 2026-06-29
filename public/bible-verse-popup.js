@@ -107,27 +107,56 @@
     document.body.appendChild(tooltip);
   }
 
+  // Detect touch/mobile to use fixed positioning (avoids scroll-offset issues)
+  const isTouchDevice = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
   function positionTooltip(anchorEl) {
+    if (!anchorEl) return;
     const rect = anchorEl.getBoundingClientRect();
-    const scrollY = window.scrollY || window.pageYOffset;
-    const scrollX = window.scrollX || window.pageXOffset;
     const tooltipW = tooltip.offsetWidth || 320;
     const gap = 10;
 
-    let top = rect.bottom + scrollY + gap;
-    let left = rect.left + scrollX + rect.width / 2 - tooltipW / 2;
+    if (isTouchDevice()) {
+      // On mobile: use fixed positioning relative to viewport
+      tooltip.style.position = 'fixed';
+      let top = rect.bottom + gap;
+      let left = rect.left + rect.width / 2 - tooltipW / 2;
 
-    // Keep within viewport horizontally
-    const maxLeft = window.innerWidth - tooltipW - 16;
-    left = Math.max(16, Math.min(left, maxLeft));
+      // Keep within viewport horizontally
+      const maxLeft = window.innerWidth - tooltipW - 16;
+      left = Math.max(16, Math.min(left, maxLeft));
 
-    // Flip above if too close to bottom
-    if (rect.bottom + 160 > window.innerHeight) {
-      top = rect.top + scrollY - tooltip.offsetHeight - gap;
+      // Flip above if too close to bottom of viewport
+      const tooltipH = tooltip.offsetHeight || 160;
+      if (top + tooltipH > window.innerHeight - 16) {
+        top = rect.top - tooltipH - gap;
+      }
+
+      // Ensure it never goes off the top
+      if (top < 10) top = 10;
+
+      tooltip.style.top = top + 'px';
+      tooltip.style.left = left + 'px';
+    } else {
+      // On desktop: use absolute positioning with scroll offset
+      tooltip.style.position = 'absolute';
+      const scrollY = window.scrollY || window.pageYOffset;
+      const scrollX = window.scrollX || window.pageXOffset;
+      let top = rect.bottom + scrollY + gap;
+      let left = rect.left + scrollX + rect.width / 2 - tooltipW / 2;
+
+      // Keep within viewport horizontally
+      const maxLeft = window.innerWidth - tooltipW - 16;
+      left = Math.max(16, Math.min(left, maxLeft));
+
+      // Flip above if too close to bottom
+      if (rect.bottom + 160 > window.innerHeight) {
+        top = rect.top + scrollY - tooltip.offsetHeight - gap;
+      }
+
+      tooltip.style.top = top + 'px';
+      tooltip.style.left = left + 'px';
     }
-
-    tooltip.style.top = top + 'px';
-    tooltip.style.left = left + 'px';
   }
 
   function showTooltip(anchorEl, ref, apiQuery) {
@@ -144,7 +173,7 @@
     }
 
     const url = `${API_BASE}${apiQuery}?translation=${BIBLE_VERSION}`;
-    fetch(url)
+    fetch(url, { mode: 'cors' })
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(data => {
         const text = data.verses
@@ -153,17 +182,20 @@
         cache[apiQuery] = text || 'Verse text not available.';
         renderVerse(cache[apiQuery]);
       })
-      .catch(() => {
-        cache[apiQuery] = '⚠ Could not load verse. Please check your connection.';
+      .catch(err => {
+        // Do NOT cache errors — allow the user to retry by tapping again
         tooltip.classList.add('bvp-error');
-        renderVerse(cache[apiQuery]);
+        const errorMsg = navigator.onLine
+          ? '⚠ Could not load verse. The scripture service may be temporarily unavailable.'
+          : '⚠ No internet connection. Please connect and tap again.';
+        renderVerse(errorMsg);
       });
   }
 
   function renderVerse(text) {
     tooltip.querySelector('.bvp-loading').style.display = 'none';
     tooltip.querySelector('.bvp-text').textContent = `"${text}"`;
-    positionTooltip(tooltip._anchor);
+    if (tooltip._anchor) positionTooltip(tooltip._anchor);
   }
 
   function hideTooltip() {
